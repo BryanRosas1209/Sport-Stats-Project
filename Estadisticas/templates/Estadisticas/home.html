@@ -1,0 +1,64 @@
+{% extends 'Estadisticas/base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-7">
+            <h3 class="mb-4">Equipos</h3>
+            <div class="row">
+                {% for equipo in equipos %}
+                <div class="col-md-6 mb-3">
+                    <div class="card shadow-sm border-0">
+                        <div class="card-body d-flex align-items-center">
+                            {% if equipo.escudo %}
+                                <img src="{{ equipo.escudo.url }}" alt="Escudo" 
+                                     style="width: 60px; height: 60px; object-fit: contain; margin-right: 15px;">
+                            {% else %}
+                                <div class="bg-light d-flex align-items-center justify-content-center text-muted" 
+                                     style="width: 60px; height: 60px; border-radius: 50%; margin-right: 15px;">
+                                    <small>N/A</small>
+                                </div>
+                            {% endif %}
+                            
+                            <div>
+                                <h5 class="mb-0 text-uppercase fw-bold">{{ equipo.nombre }}</h5>
+                                <small class="text-muted">{{ equipo.ciudad }}</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <p class="text-muted">No hay equipos registrados.</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="col-md-5">
+            <h3 class="mb-4">Resultados Recientes</h3>
+            <div class="list-group">
+                {% for partido in partidos %}
+                <div class="list-group-item shadow-sm mb-2 border-0 rounded">
+                    <div class="d-flex justify-content-between align-items-center py-2">
+                        <div class="text-center" style="flex: 1;">
+                            <span class="fw-bold">{{ partido.equipo_local.nombre }}</span>
+                        </div>
+
+                        <div class="px-3">
+                            <span class="badge bg-dark fs-5 p-2 px-3">
+                                {{ partido.goles_local }} - {{ partido.goles_visitante }}
+                            </span>
+                        </div>
+
+                        <div class="text-center" style="flex: 1;">
+                            <span class="fw-bold">{{ partido.equipo_visitante.nombre }}</span>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <p class="text-muted text-center">No hay partidos jugados.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

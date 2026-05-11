@@ -1,0 +1,15 @@
+{% extends 'Estadisticas/base.html' %}
+
+{% block content %}
+<div class="container mt-5 text-center">
+    <div class="alert alert-danger">
+        <h3>¿Estás seguro de eliminar a {{ jugador.nombre }}?</h3>
+        <p>Esta acción no se puede deshacer.</p>
+        <form method="POST">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger">Sí, eliminar</button>
+            <a href="{% url 'panel_editor' %}" class="btn btn-secondary">Cancelar</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

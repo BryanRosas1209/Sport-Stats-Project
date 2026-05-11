@@ -1,0 +1,40 @@
+{% extends 'Estadisticas/base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Panel de Gestión Deportiva</h2>
+        <a href="{% url 'jugador_crear' %}" class="btn btn-primary">+ Nuevo Jugador</a>
+    </div>
+
+    <div class="card shadow">
+        <div class="card-body">
+            <table class="table table-hover">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Posición</th>
+                        <th>Equipo</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for j in jugadores %}
+                    <tr>
+                        <td>{{ j.nombre }}</td>
+                        <td>{{ j.posicion }}</td>
+                        <td>{{ j.equipo.nombre }}</td>
+                        <td>
+                            <a href="{% url 'jugador_editar' j.id %}" class="btn btn-sm btn-warning">Editar</a>
+                            <a href="{% url 'jugador_eliminar' j.id %}" class="btn btn-sm btn-danger">Eliminar</a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="4" class="text-center">No hay jugadores registrados.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
