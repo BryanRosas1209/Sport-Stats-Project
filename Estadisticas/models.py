@@ -30,32 +30,33 @@ class Liga(models.Model):
     def __str__(self):
         return self.nombre
 
-# 🛡️ Equipo (Incluye Escudo y Precio)
+# 🛡️ Equipo
 class Equipo(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     nombre = models.CharField(max_length=150)
     ciudad = models.CharField(max_length=100)
     liga = models.ForeignKey(Liga, on_delete=models.SET_NULL, null=True, related_name='equipos')
     escudo = models.ImageField(upload_to='escudos/', null=True, blank=True)
-    # --- NUEVO CAMPO PARA EL CARRITO ---
-    precio = models.DecimalField(max_digits=10, decimal_places=2, default=0.00) 
 
     def __str__(self):
         return self.nombre
 
-# 🏃 Jugador
+# 🏃 Jugador (MERCADO DE FICHAJES)
 class Jugador(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     nombre = models.CharField(max_length=150)
     posicion = models.CharField(max_length=50)
     equipo = models.ForeignKey(Equipo, on_delete=models.CASCADE, related_name='jugadores')
+    # --- CAMPOS DE MERCADO ---
+    precio = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    foto = models.ImageField(upload_to='jugadores/', null=True, blank=True)
 
     class Meta:
         verbose_name = "Jugador"
         verbose_name_plural = "Jugadores"
 
     def __str__(self):
-        return self.nombre
+        return f"{self.nombre} - {self.posicion} (${self.precio})"
 
 # 📅 Partido
 class Partido(models.Model):
@@ -90,20 +91,11 @@ class Trofeo(models.Model):
     anio = models.PositiveIntegerField()
     equipo = models.ForeignKey(Equipo, on_delete=models.CASCADE, related_name='trofeos')
 
-    def __str__(self):
-        return f"{self.nombre} ({self.anio})"
-
-# ==========================================
-# 🛒 NUEVOS MODELOS PARA EL CARRITO
-# ==========================================
-
+# 🛒 CARRITO DE FICHAJES
 class Cart(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='cart')
     created_at = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return f"Carrito de {self.user.username}"
 
     @property
     def total(self):
@@ -112,15 +104,12 @@ class Cart(models.Model):
 class CartItem(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE, related_name='items')
-    equipo = models.ForeignKey(Equipo, on_delete=models.CASCADE)
+    jugador = models.ForeignKey(Jugador, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField(default=1)
 
     class Meta:
-        unique_together = ('cart', 'equipo')
+        unique_together = ('cart', 'jugador')
 
     @property
     def subtotal(self):
-        return self.equipo.precio * self.quantity
-
-    def __str__(self):
-        return f"{self.equipo.nombre} x {self.quantity}"
+        return self.jugador.precio * self.quantity
