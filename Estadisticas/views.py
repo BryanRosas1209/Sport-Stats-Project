@@ -13,25 +13,14 @@ from .forms import JugadorForm
 # =========================
 def home(request):
     query = request.GET.get('q')
-    equipos_list = Equipo.objects.all()
+    # select_related carga la liga al mismo tiempo que el equipo
+    equipos_list = Equipo.objects.select_related('liga').all() 
 
     if query:
         equipos_list = equipos_list.filter(
             Q(nombre__icontains=query) | 
             Q(ciudad__icontains=query)
         )
-
-    paginator = Paginator(equipos_list, 6)
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
-
-    partidos = Partido.objects.all().order_by('-fecha')[:5]
-    
-    return render(request, 'Estadisticas/home.html', {
-        'page_obj': page_obj, 
-        'partidos': partidos,
-        'query': query
-    })
 
 # =========================
 # 🛒 Gestión del Carrito
