@@ -1,39 +1,27 @@
 from django.contrib import admin
 from .models import User, Liga, Equipo, Jugador, Partido, EstadisticaPartido, Trofeo
 
-# Inline para ver jugadores dentro de un equipo
+# Registrar modelos secundarios estándar
+admin.site.register(User)
+admin.site.register(Liga)
+admin.site.register(Partido)
+admin.site.register(EstadisticaPartido)
+admin.site.register(Trofeo)
+
+# 🚀 REGISTRO MASIVO DE JUGADORES DENTRO DEL FORMULARIO DEL EQUIPO
 class JugadorInline(admin.TabularInline):
     model = Jugador
-    extra = 1
-
-# Inline para registrar estadísticas dentro de un partido (Estilo CartItem)
-class EstadisticaPartidoInline(admin.TabularInline):
-    model = EstadisticaPartido
-    extra = 2 # Espacios vacíos para llenar rápido
+    extra = 5  # Cantidad de filas vacías listas para rellenar de golpe
+    fields = ['nombre', 'posicion', 'precio', 'foto']
 
 @admin.register(Equipo)
 class EquipoAdmin(admin.ModelAdmin):
-    list_display = ('nombre', 'liga', 'ciudad')
-    list_filter = ('liga',)
-    inlines = [JugadorInline]
+    list_display = ['nombre', 'ciudad', 'liga']
+    inlines = [JugadorInline] # Inserta la cuadrícula masiva
 
-@admin.register(Partido)
-class PartidoAdmin(admin.ModelAdmin):
-    list_display = ('equipo_local', 'equipo_visitante', 'fecha')
-    inlines = [EstadisticaPartidoInline] # Aquí llenas los goles del partido
-
+# Registro individual clásico (para búsquedas rápidas)
 @admin.register(Jugador)
 class JugadorAdmin(admin.ModelAdmin):
-    list_display = ('nombre', 'equipo', 'posicion')
-    search_fields = ('nombre',)
-
-@admin.register(Liga)
-class LigaAdmin(admin.ModelAdmin):
-    list_display = ('nombre', 'pais')
-
-@admin.register(Trofeo)
-class TrofeoAdmin(admin.ModelAdmin):
-    list_display = ('nombre', 'anio', 'equipo')
-    list_filter = ('equipo',)
-
-admin.site.register(User)
+    list_display = ['nombre', 'posicion', 'equipo', 'precio']
+    list_filter = ['equipo', 'posicion']
+    search_fields = ['nombre']

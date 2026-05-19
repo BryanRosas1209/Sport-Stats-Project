@@ -47,9 +47,8 @@ class Jugador(models.Model):
     nombre = models.CharField(max_length=150)
     posicion = models.CharField(max_length=50)
     equipo = models.ForeignKey(Equipo, on_delete=models.CASCADE, related_name='jugadores')
-    # --- CAMPOS DE MERCADO ---
-    precio = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
-    foto = models.ImageField(upload_to='jugadores/', null=True, blank=True)
+    precio = models.DecimalField(max_digits=15, decimal_places=2, default=0.00)
+    foto = models.ImageField(upload_to='jugadores/', null=True, blank=True) 
 
     class Meta:
         verbose_name = "Jugador"
