@@ -6,43 +6,39 @@
         <div class="col-md-7">
             <div class="card shadow border-0">
                 <div class="card-body p-4">
-                    <h3 class="fw-bold text-center mb-4 text-dark">⚽ {{ titulo }}</h3>
+                    <h3 class="fw-bold text-center mb-4 text-dark">🛡️ {{ titulo }}</h3>
                     
-                    {% if form_masivo %}
-                    <ul class="nav nav-pills nav-justified mb-4" id="jugadorTab" role="tablist">
+                    <ul class="nav nav-pills nav-justified mb-4" id="equipoTab" role="tablist">
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link active fw-bold" id="individual-tab" data-bs-toggle="tab" data-bs-target="#individual" type="button" role="tab">👤 Uno por Uno</button>
+                            <button class="nav-link active fw-bold" id="equipo-ind-tab" data-bs-toggle="tab" data-bs-target="#equipo-ind" type="button" role="tab">🛡️ Club Individual</button>
                         </li>
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link fw-bold text-success" id="masivo-tab" data-bs-toggle="tab" data-bs-target="#masivo" type="button" role="tab">⚡ Pegado Masivo</button>
+                            <button class="nav-link fw-bold text-success" id="equipo-mas-tab" data-bs-toggle="tab" data-bs-target="#equipo-mas" type="button" role="tab">⚡ Pegar Bloque de Equipos</button>
                         </li>
                     </ul>
-                    {% endif %}
 
-                    <div class="tab-content" id="jugadorTabContent">
-                        <div class="tab-pane fade show active" id="individual" role="tabpanel">
+                    <div class="tab-content" id="equipoTabContent">
+                        <div class="tab-pane fade show active" id="equipo-ind" role="tabpanel">
                             <form method="POST" enctype="multipart/form-data">
                                 {% csrf_token %}
                                 {{ form_individual.as_p }}
                                 <div class="d-grid mt-4">
-                                    <button type="submit" name="btn_individual" class="btn btn-primary fw-bold py-2">Guardar Jugador</button>
+                                    <button type="submit" name="btn_individual" class="btn btn-primary fw-bold py-2">Guardar Equipo</button>
                                 </div>
                             </form>
                         </div>
 
-                        {% if form_masivo %}
-                        <div class="tab-pane fade" id="masivo" role="tabpanel">
+                        <div class="tab-pane fade" id="equipo-mas" role="tabpanel">
                             <form method="POST">
                                 {% csrf_token %}
                                 {{ form_masivo.as_p }}
                                 <div class="d-grid mt-4">
-                                    <button type="submit" name="btn_masivo" class="btn btn-success fw-bold py-2">⚡ Procesar Lista y subir Fotos</button>
+                                    <button type="submit" name="btn_masivo" class="btn btn-success fw-bold py-2">⚡ Registrar todos los Equipos</button>
                                 </div>
                             </form>
                         </div>
-                        {% endif %}
                     </div>
-                    
+
                     <div class="text-center mt-3">
                         <a href="{% url 'panel_editor' %}" class="btn btn-link text-muted btn-sm">Volver al Panel</a>
                     </div>

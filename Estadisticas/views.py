@@ -1,21 +1,22 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, logout
-from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
+from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseForbidden
 from django.db.models import Q
 from django.core.paginator import Paginator
-from .models import Equipo, Partido, Jugador, Cart, CartItem, Liga
-from .forms import JugadorForm
+from decimal import Decimal
 
-# =========================
+from .models import Equipo, Partido, Jugador, Cart, CartItem, Liga
+from .forms import JugadorForm, CustomUserCreationForm, ImportarPlantillaForm, EquipoForm, ImportarEquiposForm
+
+# ==============================================================================
 # 🏠 Mercado de Fichajes (Home)
-# =========================
+# ==============================================================================
 def home(request):
     query = request.GET.get('q')
     liga_id = request.GET.get('liga')
 
-    # Optimización: Cargar equipo y liga del jugador
     jugadores_list = Jugador.objects.select_related('equipo__liga').all()
 
     if query:
@@ -26,7 +27,7 @@ def home(request):
     if liga_id:
         jugadores_list = jugadores_list.filter(equipo__liga__id=liga_id)
 
-    paginator = Paginator(jugadores_list, 9) # 9 jugadores por página
+    paginator = Paginator(jugadores_list, 9)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
 
@@ -40,9 +41,9 @@ def home(request):
         'query': query
     })
 
-# =========================
+# ==============================================================================
 # 🛒 Lógica de Fichajes
-# =========================
+# ==============================================================================
 @login_required
 def cart_detail(request):
     cart, _ = Cart.objects.get_or_create(user=request.user)
@@ -77,9 +78,9 @@ def update_cart_item(request, item_id):
             item.delete()
     return redirect('cart_detail')
 
-# =========================
+# ==============================================================================
 # 📊 Panel y CRUD (Solo Editores)
-# =========================
+# ==============================================================================
 @login_required
 def panel_editor(request):
     if not request.user.is_editor:
@@ -87,14 +88,41 @@ def panel_editor(request):
     jugadores = Jugador.objects.all()
     return render(request, 'Estadisticas/panel.html', {'jugadores': jugadores})
 
+# 🏃 VISTA UNIFICADA: JUGADORES (INDIVIDUAL O MASIVO)
 @login_required
 def jugador_crear(request):
     if not request.user.is_editor: return HttpResponseForbidden()
-    form = JugadorForm(request.POST or None, request.FILES or None)
-    if form.is_valid():
-        form.save()
-        return redirect('panel_editor')
-    return render(request, 'Estadisticas/jugador_form.html', {'form': form, 'titulo': 'Nuevo Fichaje'})
+    
+    form_individual = JugadorForm(request.POST or None, request.FILES or None)
+    form_masivo = ImportarPlantillaForm(request.POST or None)
+    
+    if request.method == 'POST':
+        if 'btn_individual' in request.POST and form_individual.is_valid():
+            form_individual.save()
+            return redirect('panel_editor')
+            
+        elif 'btn_masivo' in request.POST and form_masivo.is_valid():
+            equipo_sel = form_masivo.cleaned_data['equipo']
+            lineas = form_masivo.cleaned_data['datos_pegados'].strip().split('\n')
+            for linea in lineas:
+                if not linea.strip(): continue
+                partes = linea.split(',')
+                if len(partes) >= 3:
+                    try: precio = Decimal(partes[2].strip())
+                    except: precio = Decimal('0.00')
+                    Jugador.objects.create(
+                        nombre=partes[0].strip(),
+                        posicion=partes[1].strip(),
+                        equipo=equipo_sel,
+                        precio=precio
+                    )
+            return redirect('cargar_fotos_masivo')
+
+    return render(request, 'Estadisticas/jugador_form.html', {
+        'form_individual': form_individual,
+        'form_masivo': form_masivo,
+        'titulo': 'Registrar Fichajes'
+    })
 
 @login_required
 def jugador_editar(request, pk):
@@ -104,7 +132,7 @@ def jugador_editar(request, pk):
     if form.is_valid():
         form.save()
         return redirect('panel_editor')
-    return render(request, 'Estadisticas/jugador_form.html', {'form': form, 'titulo': 'Editar Ficha'})
+    return render(request, 'Estadisticas/jugador_form.html', {'form_individual': form, 'form_masivo': None, 'titulo': 'Editar Ficha'})
 
 @login_required
 def jugador_eliminar(request, pk):
@@ -115,9 +143,58 @@ def jugador_eliminar(request, pk):
         return redirect('panel_editor')
     return render(request, 'Estadisticas/jugador_confirm_delete.html', {'jugador': jugador})
 
-# =========================
+# 🛡️ VISTA UNIFICADA: EQUIPOS (INDIVIDUAL O MASIVO)
+@login_required
+def equipo_crear(request):
+    if not request.user.is_editor: return HttpResponseForbidden()
+    
+    form_individual = EquipoForm(request.POST or None, request.FILES or None)
+    form_masivo = ImportarEquiposForm(request.POST or None)
+    
+    if request.method == 'POST':
+        if 'btn_individual' in request.POST and form_individual.is_valid():
+            form_individual.save()
+            return redirect('panel_editor')
+            
+        elif 'btn_masivo' in request.POST and form_masivo.is_valid():
+            liga_sel = form_masivo.cleaned_data['liga']
+            lineas = form_masivo.cleaned_data['equipos_pegados'].strip().split('\n')
+            for linea in lineas:
+                if not linea.strip(): continue
+                partes = linea.split(',')
+                if len(partes) >= 2:
+                    Equipo.objects.create(
+                        nombre=partes[0].strip(),
+                        ciudad=partes[1].strip(),
+                        liga=liga_sel
+                    )
+            return redirect('panel_editor')
+
+    return render(request, 'Estadisticas/equipo_form.html', {
+        'form_individual': form_individual,
+        'form_masivo': form_masivo,
+        'titulo': 'Registrar Equipos'
+    })
+
+# 📸 CARGA DE FOTOS AUTOMÁTICA POST-PEGADO
+@login_required
+def cargar_fotos_masivo(request):
+    if not request.user.is_editor: return HttpResponseForbidden()
+    jugadores_sin_foto = Jugador.objects.filter(foto='')
+    
+    if request.method == 'POST':
+        for jugador in jugadores_sin_foto:
+            campo_foto_id = f"foto_{jugador.id}"
+            if campo_foto_id in request.FILES:
+                jugador.foto = request.FILES[campo_foto_id]
+                jugador.save()
+        return redirect('panel_editor')
+        
+    return render(request, 'Estadisticas/cargar_fotos_masivo.html', {'jugadores': jugadores_sin_foto})
+
+# ==============================================================================
 # 🔐 Autenticación
-# =========================
+# ==============================================================================
 def login_view(request):
     if request.method == 'POST':
         form = AuthenticationForm(data=request.POST)
@@ -133,10 +210,11 @@ def logout_view(request):
 
 def register(request):
     if request.method == 'POST':
-        form = UserCreationForm(request.POST)
+        form = CustomUserCreationForm(request.POST)
         if form.is_valid():
             user = form.save()
             login(request, user)
             return redirect('home')
-    else: form = UserCreationForm()
+    else: 
+        form = CustomUserCreationForm()
     return render(request, 'Estadisticas/register.html', {'form': form})
