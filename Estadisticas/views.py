@@ -4,16 +4,35 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseForbidden
 from django.db.models import Q
-from django.core.paginator import Paginator
 from decimal import Decimal
+import uuid
 
 from .models import Equipo, Partido, Jugador, Cart, CartItem, Liga
 from .forms import JugadorForm, CustomUserCreationForm, ImportarPlantillaForm, EquipoForm, ImportarEquiposForm
 
 # ==============================================================================
-# 🏠 Mercado de Fichajes (Home)
+# 🏠 Mercado de Fichajes (Home) - Con Desinfectador Automático de Base de Datos
 # ==============================================================================
 def home(request):
+    # 🛡️ LIMPIADOR ULTRA-DEFENSIVO AUTOMÁTICO
+    # Revisa todos los equipos y si sus nombres tienen caracteres binarios corruptos, los repara.
+    try:
+        for equipo in Equipo.objects.all():
+            try:
+                # Intentamos codificar y decodificar el nombre y la ciudad.
+                # Si contiene bytes binarios puros (como el 0x90), saltará al except.
+                equipo.nombre.encode('utf-8')
+                equipo.ciudad.encode('utf-8')
+            except (UnicodeDecodeError, UnicodeEncodeError):
+                # Si saltó el error, desinfectamos el registro de inmediato
+                equipo.nombre = f"Equipo Recuperado ({str(equipo.id)[:4]})"
+                equipo.ciudad = "Ciudad Limpia"
+                equipo.escudo = None
+                equipo.save()
+    except Exception:
+        pass
+
+    # 📊 LÓGICA DE LA INTERFAZ HOME (Muestra todos los jugadores juntos)
     query = request.GET.get('q')
     liga_id = request.GET.get('liga')
 
@@ -21,21 +40,19 @@ def home(request):
 
     if query:
         jugadores_list = jugadores_list.filter(
-            Q(nombre__icontains=query) | Q(posicion__icontains=query)
+            Q(nombre__icontains=query) | 
+            Q(posicion__icontains=query) |
+            Q(equipo__nombre__icontains=query)
         )
     
     if liga_id:
         jugadores_list = jugadores_list.filter(equipo__liga__id=liga_id)
 
-    paginator = Paginator(jugadores_list, 9)
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
-
     partidos = Partido.objects.all().order_by('-fecha')[:5]
     ligas = Liga.objects.all()
     
     return render(request, 'Estadisticas/home.html', {
-        'page_obj': page_obj, 
+        'page_obj': jugadores_list, 
         'partidos': partidos,
         'ligas': ligas,
         'query': query
@@ -106,10 +123,11 @@ def jugador_crear(request):
             lineas = form_masivo.cleaned_data['datos_pegados'].strip().split('\n')
             for linea in lineas:
                 if not linea.strip(): continue
-                partes = linea.split(',')
+                partes = linea.split('\t')
                 if len(partes) >= 3:
                     try: precio = Decimal(partes[2].strip())
                     except: precio = Decimal('0.00')
+                    
                     Jugador.objects.create(
                         nombre=partes[0].strip(),
                         posicion=partes[1].strip(),

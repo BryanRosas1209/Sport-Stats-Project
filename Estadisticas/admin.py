@@ -1,6 +1,8 @@
 # coding: utf-8
 from django.contrib import admin
 from django import forms
+from django.db import models
+from django.forms import TextInput
 from decimal import Decimal
 import re
 from .models import User, Liga, Equipo, Jugador, Partido, EstadisticaPartido, Trofeo
@@ -11,6 +13,15 @@ from .models import User, Liga, Equipo, Jugador, Partido, EstadisticaPartido, Tr
 class EquipoAdminForm(forms.ModelForm):
     nombre = forms.CharField(required=False, widget=forms.TextInput(attrs={'class': 'vTextField'}))
     ciudad = forms.CharField(required=False, widget=forms.TextInput(attrs={'class': 'vTextField'}))
+    
+    # 🛡️ INTERCEPCIÓN RADICAL: Forzamos a que el admin trate el escudo como un texto simple 
+    # en el formulario visual. Esto anula por completo el texto de "Actualmente: ..." de Django 
+    # que es lo que rompe la plantilla con bytes 0x90.
+    escudo = forms.CharField(
+        required=False, 
+        widget=forms.TextInput(attrs={'class': 'vTextField', 'placeholder': 'Ruta del escudo binario'}),
+        help_text="Parche activo: campo configurado como texto para evitar bloqueos por corrupción binaria."
+    )
     
     equipos_masivos = forms.CharField(
         widget=forms.Textarea(attrs={'class': 'vLargeTextField', 'rows': 5}),
@@ -41,6 +52,11 @@ class EquipoAdmin(admin.ModelAdmin):
                         liga=liga_sel
                     )
             return
+        
+        # Si limpias el campo de texto manualmente en el admin, reseteamos el objeto
+        if not form.cleaned_data.get('escudo'):
+            obj.escudo = None
+            
         if obj.nombre:
             super().save_model(request, obj, form, change)
 
@@ -51,6 +67,13 @@ class EquipoAdmin(admin.ModelAdmin):
 class JugadorAdminForm(forms.ModelForm):
     nombre = forms.CharField(required=False, widget=forms.TextInput(attrs={'class': 'vTextField'}))
     posicion = forms.CharField(required=False, widget=forms.TextInput(attrs={'class': 'vTextField'}))
+    
+    # 🛡️ Aplicamos el mismo blindaje preventivo a las fotos de los jugadores
+    foto = forms.CharField(
+        required=False, 
+        widget=forms.TextInput(attrs={'class': 'vTextField', 'placeholder': 'Ruta de la foto'}),
+        help_text="Parche activo contra corrupciones de codificación."
+    )
     
     jugadores_masivos = forms.CharField(
         widget=forms.Textarea(attrs={'class': 'vLargeTextField', 'rows': 5}),
@@ -81,7 +104,6 @@ class JugadorAdmin(admin.ModelAdmin):
                     posicion = partes[1].strip()
                     precio = Decimal('0.00')
                     
-                    # Si viene el precio en la tercera columna, lo procesamos
                     if len(partes) >= 3:
                         try:
                             precio_limpio = partes[2].replace('$', '').replace('.', '').replace(',', '.').strip()
@@ -96,6 +118,9 @@ class JugadorAdmin(admin.ModelAdmin):
                         precio=precio
                     )
             return
+        
+        if not form.cleaned_data.get('foto'):
+            obj.foto = None
             
         if obj.nombre:
             super().save_model(request, obj, form, change)
