@@ -2,7 +2,7 @@
 from django.contrib import admin
 from django import forms
 from django.db import models
-from django.forms import TextInput
+from django.forms import ClearableFileInput
 from decimal import Decimal
 import re
 from .models import User, Liga, Equipo, Jugador, Partido, EstadisticaPartido, Trofeo
@@ -14,15 +14,9 @@ class EquipoAdminForm(forms.ModelForm):
     nombre = forms.CharField(required=False, widget=forms.TextInput(attrs={'class': 'vTextField'}))
     ciudad = forms.CharField(required=False, widget=forms.TextInput(attrs={'class': 'vTextField'}))
     
-    # 🛡️ INTERCEPCIÓN RADICAL: Forzamos a que el admin trate el escudo como un texto simple 
-    # en el formulario visual. Esto anula por completo el texto de "Actualmente: ..." de Django 
-    # que es lo que rompe la plantilla con bytes 0x90.
-    escudo = forms.CharField(
-        required=False, 
-        widget=forms.TextInput(attrs={'class': 'vTextField', 'placeholder': 'Ruta del escudo binario'}),
-        help_text="Parche activo: campo configurado como texto para evitar bloqueos por corrupción binaria."
-    )
-    
+    # RESTAURADO: Volvemos a habilitar la subida de imágenes nativa de Django
+    escudo = forms.ImageField(required=False, widget=ClearableFileInput(attrs={'class': 'vFileField'}))
+
     equipos_masivos = forms.CharField(
         widget=forms.Textarea(attrs={'class': 'vLargeTextField', 'rows': 5}),
         required=False,
@@ -53,10 +47,6 @@ class EquipoAdmin(admin.ModelAdmin):
                     )
             return
         
-        # Si limpias el campo de texto manualmente en el admin, reseteamos el objeto
-        if not form.cleaned_data.get('escudo'):
-            obj.escudo = None
-            
         if obj.nombre:
             super().save_model(request, obj, form, change)
 
@@ -68,12 +58,8 @@ class JugadorAdminForm(forms.ModelForm):
     nombre = forms.CharField(required=False, widget=forms.TextInput(attrs={'class': 'vTextField'}))
     posicion = forms.CharField(required=False, widget=forms.TextInput(attrs={'class': 'vTextField'}))
     
-    # 🛡️ Aplicamos el mismo blindaje preventivo a las fotos de los jugadores
-    foto = forms.CharField(
-        required=False, 
-        widget=forms.TextInput(attrs={'class': 'vTextField', 'placeholder': 'Ruta de la foto'}),
-        help_text="Parche activo contra corrupciones de codificación."
-    )
+    # RESTAURADO: Subida de fotos original sin bloqueos binarios
+    foto = forms.ImageField(required=False, widget=ClearableFileInput(attrs={'class': 'vFileField'}))
     
     jugadores_masivos = forms.CharField(
         widget=forms.Textarea(attrs={'class': 'vLargeTextField', 'rows': 5}),
@@ -119,9 +105,6 @@ class JugadorAdmin(admin.ModelAdmin):
                     )
             return
         
-        if not form.cleaned_data.get('foto'):
-            obj.foto = None
-            
         if obj.nombre:
             super().save_model(request, obj, form, change)
 

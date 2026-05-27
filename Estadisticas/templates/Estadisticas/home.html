@@ -1,112 +1,138 @@
-{% extends 'Estadisticas/base.html' %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Mercado de Fichajes - Sport Stats</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
+            margin: 0;
+            padding: 40px;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .grid-jugadores {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .card-jugador {
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            padding: 20px;
+            text-align: center;
+            transition: transform 0.2s;
+        }
+        .card-jugador:hover {
+            transform: translateY(-5px);
+        }
+        .contenedor-foto {
+            width: 90px;
+            height: 90px;
+            margin: 0 auto 15px auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .foto-perfil {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #00bc8c;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .sin-foto {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            background-color: #f0f2f5;
+            color: #a0aab4;
+            font-weight: bold;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 3px dashed #cbd5e1;
+        }
+        .nombre {
+            font-size: 20px;
+            font-weight: 700;
+            color: #2c3e50;
+            margin: 10px 0 5px 0;
+            text-transform: uppercase;
+        }
+        .posicion {
+            font-size: 14px;
+            color: #7f8c8d;
+            background: #eef2f5;
+            padding: 4px 12px;
+            border-radius: 20px;
+            display: inline-block;
+            margin-bottom: 15px;
+        }
+        .precio {
+            font-size: 22px;
+            font-weight: bold;
+            color: #27ae60;
+            margin-bottom: 15px;
+        }
+        .btn-añadir {
+            background-color: #fff;
+            color: #3498db;
+            border: 2px solid #3498db;
+            padding: 8px 20px;
+            font-size: 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+        .btn-añadir:hover {
+            background-color: #3498db;
+            color: white;
+        }
+    </style>
+</head>
+<body>
 
-{% block content %}
-<div class="container mt-4">
-    <div class="row mb-5 justify-content-center">
-        <div class="col-md-10">
-            <form method="GET" action="{% url 'home' %}" class="input-group shadow-sm">
-                <input type="text" name="q" class="form-control border-0" 
-                       placeholder="Buscar equipo o ciudad..." value="{{ query|default:'' }}">
-                <button class="btn btn-dark px-4" type="submit">
-                    <i class="bi bi-search"></i> Buscar
-                </button>
-            </form>
-        </div>
+    <h1>MERCADO DE FICHAJES</h1>
+
+    <div class="grid-jugadores">
+        {% for jugador in page_obj %}
+            <div class="card-jugador">
+                
+                <div class="contenedor-foto">
+                    {% if jugador.foto %}
+                        <img src="{{ jugador.foto.url }}" alt="{{ jugador.nombre }}" class="foto-perfil">
+                    {% else %}
+                        <div class="sin-foto">N/A</div>
+                    {% endif %}
+                </div>
+
+                <div class="nombre">{{ jugador.nombre }}</div>
+                <div class="posicion">{{ jugador.posicion }}</div>
+                <div class="precio">${{ jugador.precio }}</div>
+                
+                <a href="{% url 'add_to_cart' jugador.id %}" class="btn-añadir">
+                    🛒 Añadir
+                </a>
+            </div>
+        {% empty %}
+            <p style="text-align: center; grid-column: 1/-1; color: #7f8c8d;">No hay jugadores registrados actualmente.</p>
+        {% endfor %}
     </div>
 
-    <div class="row">
-        <div class="col-md-7">
-            <h3 class="mb-4 fw-bold">Equipos Disponibles</h3>
-            <div class="row">
-                {% for equipo in page_obj %}
-                <div class="col-md-6 mb-4">
-                    <div class="card shadow-sm border-0 h-100">
-                        <div class="card-body">
-                            <div class="d-flex align-items-center mb-3">
-                                {% if equipo.escudo %}
-                                    <img src="{{ equipo.escudo.url }}" alt="Escudo" 
-                                         style="width: 50px; height: 50px; object-fit: contain; margin-right: 15px;">
-                                {% else %}
-                                    <div class="bg-light d-flex align-items-center justify-content-center text-muted" 
-                                         style="width: 50px; height: 50px; border-radius: 50%; margin-right: 15px;">
-                                        <small>N/A</small>
-                                    </div>
-                                {% endif %}
-                                <div>
-                                    <h5 class="mb-0 text-uppercase fw-bold">{{ equipo.nombre }}</h5>
-                                    <small class="text-muted">{{ equipo.ciudad }}</small>
-                                </div>
-                            </div>
-                            
-                            <div class="mt-auto border-top pt-3">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <span class="fs-5 fw-bold text-success">${{ equipo.precio }}</span>
-                                    {% if user.is_authenticated %}
-                                        <a href="{% url 'add_to_cart' equipo.id %}" class="btn btn-sm btn-outline-primary">
-                                            🛒 Añadir
-                                        </a>
-                                    {% endif %}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                {% empty %}
-                <div class="col-12">
-                    <p class="text-muted">No se encontraron equipos con ese nombre.</p>
-                </div>
-                {% endfor %}
-            </div>
-
-            {% if page_obj.has_other_pages %}
-            <nav class="mt-4">
-                <ul class="pagination justify-content-center">
-                    {% if page_obj.has_previous %}
-                        <li class="page-item">
-                            <a class="page-link text-dark" href="?page={{ page_obj.previous_page_number }}{% if query %}&q={{ query }}{% endif %}">Anterior</a>
-                        </li>
-                    {% endif %}
-
-                    <li class="page-item active">
-                        <span class="page-link bg-dark border-dark">{{ page_obj.number }}</span>
-                    </li>
-
-                    {% if page_obj.has_next %}
-                        <li class="page-item">
-                            <a class="page-link text-dark" href="?page={{ page_obj.next_page_number }}{% if query %}&q={{ query }}{% endif %}">Siguiente</a>
-                        </li>
-                    {% endif %}
-                </ul>
-            </nav>
-            {% endif %}
-        </div>
-
-        <div class="col-md-5">
-            <h3 class="mb-4 fw-bold text-end">Resultados</h3>
-            <div class="list-group">
-                {% for partido in partidos %}
-                <div class="list-group-item shadow-sm mb-2 border-0 rounded p-3">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div class="text-center" style="flex: 1;">
-                            <span class="fw-bold d-block">{{ partido.equipo_local.nombre }}</span>
-                        </div>
-
-                        <div class="px-3">
-                            <span class="badge bg-dark fs-5 p-2 px-3">
-                                {{ partido.goles_local }} - {{ partido.goles_visitante }}
-                            </span>
-                        </div>
-
-                        <div class="text-center" style="flex: 1;">
-                            <span class="fw-bold d-block">{{ partido.equipo_visitante.nombre }}</span>
-                        </div>
-                    </div>
-                </div>
-                {% empty %}
-                <p class="text-muted text-center">No hay partidos jugados.</p>
-                {% endfor %}
-            </div>
-        </div>
-    </div>
-</div>
-{% endblock %}
+</body>
+</html>

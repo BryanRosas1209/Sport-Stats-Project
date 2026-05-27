@@ -3,6 +3,17 @@ import uuid
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 
+# Función auxiliar para desinfectar strings binarios corruptos de Excel
+def limpiar_string_corrupto(valor):
+    if isinstance(valor, str):
+        try:
+            valor.encode('utf-8')
+            return valor
+        except (UnicodeDecodeError, UnicodeEncodeError):
+            # Filtra caracteres no legibles (como bytes 0x90) de manera transparente
+            return "".join([c for c in valor if c.isprintable()]).strip() or "Dato Sanado"
+    return valor
+
 # ==========================================
 # 👤 MODELO DE USUARIO CUSTOM
 # ==========================================
@@ -22,10 +33,7 @@ class User(AbstractUser):
     )
 
     def __str__(self):
-        try:
-            return str(self.username)
-        except:
-            return "Usuario Anonimo"
+        return str(self.username)
 
 # ==========================================
 # 🏆 MODELO DE LIGA
@@ -39,11 +47,7 @@ class Liga(models.Model):
         verbose_name_plural = "Ligas"
 
     def __str__(self):
-        try:
-            # Blindaje contra bytes corruptos en la base de datos
-            return self.nombre.encode('utf-8', errors='ignore').decode('utf-8')
-        except:
-            return "Liga"
+        return limpiar_string_corrupto(self.nombre)
 
 # ==========================================
 # 👑 MODELO DE EQUIPO
@@ -56,11 +60,13 @@ class Equipo(models.Model):
     escudo = models.ImageField(upload_to='escudos/', null=True, blank=True)
 
     def __str__(self):
-        try:
-            # Blindaje para evitar que falle al renderizar el string del Equipo
-            return self.nombre.encode('utf-8', errors='ignore').decode('utf-8')
-        except:
-            return "Equipo"
+        return limpiar_string_corrupto(self.nombre)
+
+    def __getattribute__(self, name):
+        attr = super().__getattribute__(name)
+        if name in ['nombre', 'ciudad']:
+            return limpiar_string_corrupto(attr)
+        return attr
 
 # ==========================================
 # 🏃 MODELO DE JUGADOR
@@ -78,10 +84,13 @@ class Jugador(models.Model):
         verbose_name_plural = "Jugadores"
 
     def __str__(self):
-        try:
-            return self.nombre.encode('utf-8', errors='ignore').decode('utf-8')
-        except:
-            return "Jugador"
+        return limpiar_string_corrupto(self.nombre)
+
+    def __getattribute__(self, name):
+        attr = super().__getattribute__(name)
+        if name in ['nombre', 'posicion']:
+            return limpiar_string_corrupto(attr)
+        return attr
 
 # ==========================================
 # ⚽ MODELO DE PARTIDO
@@ -96,10 +105,13 @@ class Partido(models.Model):
     torneo = models.CharField(max_length=100, blank=True)
 
     def __str__(self):
-        try:
-            return f"{self.equipo_local} - {self.equipo_visitante}"
-        except:
-            return "Partido"
+        return f"{self.equipo_local} - {self.equipo_visitante}"
+
+    def __getattribute__(self, name):
+        attr = super().__getattribute__(name)
+        if name == 'torneo':
+            return limpiar_string_corrupto(attr)
+        return attr
 
 # ==========================================
 # 📊 RENDIMIENTO DE PARTIDOS
@@ -117,10 +129,7 @@ class EstadisticaPartido(models.Model):
         unique_together = ('jugador', 'partido')
 
     def __str__(self):
-        try:
-            return f"Stats - {self.jugador.nombre}"
-        except:
-            return "EstadisticaPartido"
+        return f"Stats - {self.jugador}"
 
 # ==========================================
 # 🏆 TROFEOS
@@ -132,13 +141,16 @@ class Trofeo(models.Model):
     equipo = models.ForeignKey(Equipo, on_delete=models.CASCADE, related_name='trofeos')
 
     def __str__(self):
-        try:
-            return self.nombre.encode('utf-8', errors='ignore').decode('utf-8')
-        except:
-            return "Trofeo"
+        return limpiar_string_corrupto(self.nombre)
+
+    def __getattribute__(self, name):
+        attr = super().__getattribute__(name)
+        if name == 'nombre':
+            return limpiar_string_corrupto(attr)
+        return attr
 
 # ==========================================
-# 🛒 MODELOS DE CARRITO (CONSERVADOS)
+# 🛒 MODELOS DE CARRITO
 # ==========================================
 class Cart(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -150,7 +162,7 @@ class Cart(models.Model):
         return sum(item.subtotal for item in self.items.all())
 
     def __str__(self):
-        return f"Carrito de {self.user.username}"
+        return f"Carrito - {self.user.username}"
 
 class CartItem(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -166,4 +178,4 @@ class CartItem(models.Model):
         return self.jugador.precio * self.quantity
 
     def __str__(self):
-        return f"{self.jugador.nombre} x {self.quantity}"
+        return f"{self.jugador} x {self.quantity}"

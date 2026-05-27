@@ -1,22 +1,25 @@
+# coding: utf-8
 import os
 from pathlib import Path
 
+# Ruta base del proyecto
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = 'django-insecure-(7*@)il7d^v^$g33%&@#a6liqdfi&42&q^s$u6vh$e9h@x6l4p'
-
+SECRET_KEY = 'django-insecure-tu-llave-secreta-aqui'
 DEBUG = True
+ALLOWED_HOSTS = []
 
-ALLOWED_HOSTS = ['10.20.7.79', 'localhost', '127.0.0.1', '*']
-
+# ==============================================================================
+# 🔌 APLICACIONES INSTALADAS (Sintaxis corregida)
+# ==============================================================================
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
-    'Estadisticas',
+    'django.sessions',
+    'django.messages',
+    'django.staticfiles',
+    'Estadisticas',  # Tu aplicación local
 ]
 
 MIDDLEWARE = [
@@ -29,15 +32,16 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'Equipos.urls'
+ROOT_URLCONF = 'Sport_Stats_Project.urls'
 
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
+                'django.template.context_processors.debug',
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
@@ -46,8 +50,9 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'Equipos.wsgi.application'
+WSGI_APPLICATION = 'Sport_Stats_Project.wsgi.application'
 
+# Base de datos
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -55,6 +60,7 @@ DATABASES = {
     }
 }
 
+# Validación de contraseñas
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
     {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
@@ -62,16 +68,23 @@ AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
-LANGUAGE_CODE = 'es-us'
+# Configuración de idioma y hora
+LANGUAGE_CODE = 'es-es'
 TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
 
+# Modelo de usuario personalizado
+AUTH_USER_MODEL = 'Estadisticas.User'
+
+# Archivos estáticos (CSS, JavaScript)
 STATIC_URL = 'static/'
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 
-import os
-
+# ==============================================================================
+# 📸 CONFIGURACIÓN ARCHIVOS MULTIMEDIA (IMÁGENES SUBIDAS)
+# ==============================================================================
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-AUTH_USER_MODEL = 'Estadisticas.User'
+
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

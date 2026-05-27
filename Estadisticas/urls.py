@@ -1,22 +1,14 @@
-from django.urls import path
-from . import views
+# coding: utf-8
+from django.contrib import admin
+from django.urls import path, include
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
-    path('', views.home, name='home'),
-    path('login/', views.login_view, name='login'),
-    path('logout/', views.logout_view, name='logout'),
-    path('registro/', views.register, name='register'),
-
-    path('carrito/', views.cart_detail, name='cart_detail'),
-    path('carrito/agregar/<uuid:jugador_id>/', views.add_to_cart, name='add_to_cart'),
-    path('carrito/eliminar/<uuid:item_id>/', views.remove_from_cart, name='remove_from_cart'),
-    path('carrito/actualizar/<uuid:item_id>/', views.update_cart_item, name='update_cart_item'),
-
-    path('panel/', views.panel_editor, name='panel_editor'),
-    path('jugador/nuevo/', views.jugador_crear, name='jugador_crear'),
-    path('jugador/editar/<uuid:pk>/', views.jugador_editar, name='jugador_editar'),
-    path('jugador/eliminar/<uuid:pk>/', views.jugador_eliminar, name='jugador_eliminar'),
-    
-    path('equipo/nuevo/', views.equipo_crear, name='equipo_crear'), # 💡 Nueva ruta de Equipos
-    path('cargar-fotos-masivo/', views.cargar_fotos_masivo, name='cargar_fotos_masivo'),
+    path('admin/', admin.site.urls),
+    path('', include('Estadisticas.urls')), # Enlaza las rutas de tu aplicación
 ]
+
+# 🛡️ Permite que Django exponga y muestre las fotos en el navegador durante el desarrollo
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
