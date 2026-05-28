@@ -107,6 +107,127 @@ Esto permite acceder a:
 
 ## 👤 User
 
+ Su función es definir la estructura principal de la base de datos utilizando modelos de Django. Aquí se crean los modelos para usuarios, ligas, equipos, jugadores, partidos, estadísticas, trofeos y carrito de compras.
+
+# coding: utf-8
+import uuid
+from django.db import models
+from django.contrib.auth.models import AbstractUser
+
+# Función auxiliar para desinfectar strings binarios corruptos de Excel
+def limpiar_string_corrupto(valor):
+    if isinstance(valor, str):
+        try:
+            valor.encode('utf-8')
+            return valor
+        except (UnicodeDecodeError, UnicodeEncodeError):
+            return "".join([c for c in valor if c.isprintable()]).strip() or "Dato Sanado"
+    return valor
+
+# ==========================================
+# 👤 MODELO DE USUARIO CUSTOM
+# ==========================================
+class User(AbstractUser):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    is_editor = models.BooleanField(default=False)
+
+    groups = models.ManyToManyField(
+        'auth.Group',
+        related_name='estadisticas_user_groups',
+        blank=True
+    )
+
+    user_permissions = models.ManyToManyField(
+        'auth.Permission',
+        related_name='estadisticas_user_permissions',
+        blank=True
+    )
+
+    def __str__(self):
+        return str(self.username)
+
+# ==========================================
+# 🏆 MODELO DE LIGA
+# ==========================================
+class Liga(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    nombre = models.CharField(max_length=100, unique=True)
+    pais = models.CharField(max_length=100, blank=True)
+
+    class Meta:
+        verbose_name_plural = "Ligas"
+
+    def __str__(self):
+        return limpiar_string_corrupto(self.nombre)
+
+# ==========================================
+# 👑 MODELO DE EQUIPO
+# ==========================================
+class Equipo(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    nombre = models.CharField(max_length=150)
+    ciudad = models.CharField(max_length=100)
+    liga = models.ForeignKey(Liga, on_delete=models.SET_NULL, null=True, related_name='equipos')
+    escudo = models.ImageField(upload_to='escudos/', null=True, blank=True)
+
+    def __str__(self):
+        return limpiar_string_corrupto(self.nombre)
+
+# ==========================================
+# 🏃 MODELO DE JUGADOR
+# ==========================================
+class Jugador(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    nombre = models.CharField(max_length=150)
+    posicion = models.CharField(max_length=50)
+    equipo = models.ForeignKey(Equipo, on_delete=models.CASCADE, related_name='jugadores')
+    precio = models.DecimalField(max_digits=15, decimal_places=2, default=0.00)
+    foto = models.ImageField(upload_to='jugadores/', null=True, blank=True)
+
+# ==========================================
+# ⚽ MODELO DE PARTIDO
+# ==========================================
+class Partido(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    fecha = models.DateTimeField()
+    equipo_local = models.ForeignKey(Equipo, on_delete=models.CASCADE, related_name='partidos_local')
+    equipo_visitante = models.ForeignKey(Equipo, on_delete=models.CASCADE, related_name='partidos_visitante')
+    goles_local = models.PositiveIntegerField(default=0)
+    goles_visitante = models.PositiveIntegerField(default=0)
+
+# ==========================================
+# 📊 ESTADÍSTICAS DE PARTIDOS
+# ==========================================
+class EstadisticaPartido(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    jugador = models.ForeignKey(Jugador, on_delete=models.CASCADE)
+    partido = models.ForeignKey(Partido, on_delete=models.CASCADE)
+    goles = models.PositiveIntegerField(default=0)
+    asistencias = models.PositiveIntegerField(default=0)
+
+# ==========================================
+# 🏆 TROFEOS
+# ==========================================
+class Trofeo(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    nombre = models.CharField(max_length=100)
+    anio = models.PositiveIntegerField()
+    equipo = models.ForeignKey(Equipo, on_delete=models.CASCADE)
+
+# ==========================================
+# 🛒 CARRITO DE COMPRAS
+# ==========================================
+class Cart(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+
+class CartItem(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
+    jugador = models.ForeignKey(Jugador, on_delete=models.CASCADE)
+    quantity = models.PositiveIntegerField(default=1)
+
+
 Modelo de usuario personalizado con permisos especiales para editores.
 
 Campos principales:
