@@ -59,12 +59,12 @@ Sport_Stats_Project/
 
 El archivo `settings.py` contiene toda la configuración principal del sistema:
 
-- configuración de base de datos,
-- aplicaciones instaladas,
-- archivos multimedia,
-- autenticación,
-- archivos estáticos,
-- templates,
+- configuración de base de datos.
+- aplicaciones instaladas.
+- archivos multimedia.
+- autenticación.
+- archivos estáticos.
+- templates.
 - permisos.
 
 ## Base de Datos
@@ -95,10 +95,10 @@ urlpatterns = [
 
 Esto permite acceder a:
 
-- página principal,
-- login,
-- registro,
-- panel de administración,
+- página principal.
+- login.
+- registro.
+- panel de administración.
 - gestión de jugadores y equipos.
 
 ---
@@ -347,19 +347,19 @@ def home(request):
 El sistema trabaja siguiendo el patrón MVT de Django:
 
 ```plaintext
-Usuario
-   ↓
-URL
-   ↓
-View
-   ↓
-Model
-   ↓
-Base de Datos
-   ↓
-Template
-   ↓
-Interfaz Web
+     Usuario
+        ↓
+       URL
+        ↓
+       View
+        ↓
+      Model
+        ↓
+   Base de Datos
+        ↓
+     Template
+        ↓
+    Interfaz Web
 ```
 
 Las URLs llaman las views, las views consultan los models y los templates muestran la información visualmente.
@@ -415,7 +415,7 @@ git clone <url-del-repositorio>
 ## 2. Crear entorno virtual
 
 ```bash
-python -m venv env
+python -m venv venv
 ```
 
 ---
@@ -425,21 +425,23 @@ python -m venv env
 ### Windows
 
 ```bash
-env\Scripts\activate
+venv\Scripts\activate
 ```
 
 ### Linux/Mac
 
 ```bash
-source env/bin/activate
+source venv/bin/activate
 ```
 
 ---
 
-## 4. Instalar dependencias
+## 4. Instalar librerias
 
 ```bash
-pip install -r requirements.txt
+pip install pillow
+
+pip install django==5.2
 ```
 
 ---
@@ -447,12 +449,19 @@ pip install -r requirements.txt
 ## 5. Ejecutar migraciones
 
 ```bash
+python manage.py makemigrations
+
 python manage.py migrate
 ```
 
 ---
 
-## 6. Ejecutar servidor
+## 6. Crear usuario
+```bash
+python manage.py createsuperuser
+```
+
+## 7. Ejecutar servidor
 
 ```bash
 python manage.py runserver
@@ -478,5 +487,5 @@ python manage.py runserver
 # 📖 Conclusión
 
 Sport Stats Project es una aplicación web desarrollada en Django que permite administrar información deportiva de manera organizada, dinámica y segura. El sistema integra autenticación, administración de estadísticas, relaciones entre modelos, carga de imágenes y gestión de fichajes mediante una arquitectura basada en el patrón MVT.
-67
+
 
