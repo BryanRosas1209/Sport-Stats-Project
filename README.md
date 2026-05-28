@@ -324,9 +324,9 @@ Las views contienen toda la lógica funcional del sistema.
 
 Las views:
 
-- reciben solicitudes desde las URLs,
-- consultan datos desde los models,
-- procesan información,
+- reciben solicitudes desde las URLs.
+- consultan datos desde los models.
+- procesan información.
 - envían datos a los templates.
 
 Ejemplo:
@@ -378,10 +378,10 @@ Ruta:
 
 Desde el admin se pueden:
 
-- crear jugadores,
-- editar equipos,
-- eliminar registros,
-- administrar usuarios,
+- crear jugadores.
+- editar equipos.
+- eliminar registros.
+- administrar usuarios.
 - modificar estadísticas.
 
 ---
@@ -390,7 +390,7 @@ Desde el admin se pueden:
 
 El sistema permite subir:
 
-- fotos de jugadores,
+- fotos de jugadores.
 - escudos de equipos.
 
 Configuración:
@@ -478,5 +478,5 @@ python manage.py runserver
 # 📖 Conclusión
 
 Sport Stats Project es una aplicación web desarrollada en Django que permite administrar información deportiva de manera organizada, dinámica y segura. El sistema integra autenticación, administración de estadísticas, relaciones entre modelos, carga de imágenes y gestión de fichajes mediante una arquitectura basada en el patrón MVT.
-
+67
 
