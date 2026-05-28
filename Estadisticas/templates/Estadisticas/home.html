@@ -1,138 +1,619 @@
+{% load humanize %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Mercado de Fichajes - Sport Stats</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sport Stats - Panel de Control</title>
     <style>
+        /* 🌑 ESTILO PREMIUM DARK MODE - COMÚN */
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f4f7f6;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: #0b0c10;
+            color: #c5c6c7;
             margin: 0;
             padding: 40px;
-        }
-        h1 {
-            color: #333;
-            text-align: center;
-            margin-bottom: 30px;
-        }
-        .grid-jugadores {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 25px;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-        .card-jugador {
-            background: #ffffff;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-            padding: 20px;
-            text-align: center;
-            transition: transform 0.2s;
-        }
-        .card-jugador:hover {
-            transform: translateY(-5px);
-        }
-        .contenedor-foto {
-            width: 90px;
-            height: 90px;
-            margin: 0 auto 15px auto;
+            letter-spacing: -0.02em;
+            min-height: 100vh;
             display: flex;
-            align-items: center;
-            justify-content: center;
+            flex-direction: column;
         }
-        .foto-perfil {
-            width: 90px;
-            height: 90px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 3px solid #00bc8c;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-        .sin-foto {
-            width: 90px;
-            height: 90px;
-            border-radius: 50%;
-            background-color: #f0f2f5;
-            color: #a0aab4;
-            font-weight: bold;
-            font-size: 18px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: 3px dashed #cbd5e1;
-        }
-        .nombre {
-            font-size: 20px;
-            font-weight: 700;
-            color: #2c3e50;
-            margin: 10px 0 5px 0;
-            text-transform: uppercase;
-        }
-        .posicion {
-            font-size: 14px;
-            color: #7f8c8d;
-            background: #eef2f5;
-            padding: 4px 12px;
-            border-radius: 20px;
-            display: inline-block;
-            margin-bottom: 15px;
-        }
-        .precio {
-            font-size: 22px;
-            font-weight: bold;
-            color: #27ae60;
-            margin-bottom: 15px;
-        }
-        .btn-añadir {
-            background-color: #fff;
-            color: #3498db;
-            border: 2px solid #3498db;
-            padding: 8px 20px;
-            font-size: 15px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: 600;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
+
+        /* Enlaces globales de navegación */
+        .btn-volver {
+            color: #66fcf1;
             text-decoration: none;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            display: inline-block;
+            margin-bottom: 30px;
+            transition: opacity 0.2s;
+        }
+        .btn-volver:hover { opacity: 0.8; }
+
+        h1 {
+            color: #ffffff;
+            font-size: 28px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            margin-bottom: 6px;
+        }
+
+        /* 🔐 ESQUINA SUPERIOR DERECHA: SECCIÓN AUTH */
+        .contenedor-auth {
+            position: absolute;
+            top: 30px;
+            right: 40px;
+            text-align: right;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .usuario-saludo {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #66fcf1;
+        }
+        .btn-auth {
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 500;
+            color: #ffffff;
+            transition: color 0.2s ease;
+        }
+        .btn-auth:hover { color: #66fcf1; }
+
+        /* 🏛️ COMPONENTES DEL MENÚ DE BIENVENIDA */
+        .menu-central {
+            margin: auto;
+            text-align: center;
+            max-width: 420px;
+            width: 100%;
+        }
+        .menu-central p {
+            color: #454545;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 50px;
+        }
+        .grupo-botones {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .btn-menu {
+            background-color: #1f2833;
+            color: #ffffff;
+            border: 1px solid #2f3b4c;
+            padding: 18px 24px;
+            font-size: 14px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            border-radius: 4px;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            text-align: center;
+        }
+        .btn-menu:hover {
+            background-color: transparent;
+            border-color: #66fcf1;
+            color: #66fcf1;
+        }
+        .btn-carrito { border-color: rgba(102, 252, 241, 0.3); color: #66fcf1; }
+        
+        /* Estilo especial dorado para destacar el juego */
+        .btn-juego { border-color: #f1c40f; color: #f1c40f; font-weight: bold; }
+        .btn-juego:hover { border-color: #f1c40f; color: #0b0c10; background-color: #f1c40f; }
+
+        /* 🏃 ELEMENTOS DEL CATÁLOGO DE JUGADORES */
+        .buscador-form { display: flex; gap: 10px; max-width: 600px; margin-bottom: 40px; }
+        .input-txt, .select-box {
+            background-color: #1f2833; border: 1px solid #2f3b4c; color: #ffffff;
+            padding: 12px 16px; font-size: 14px; border-radius: 4px; outline: none;
+        }
+        .input-txt { flex: 2; } .select-box { flex: 1; }
+        .btn-buscar {
+            background-color: #1f2833; border: 1px solid #66fcf1; color: #66fcf1;
+            padding: 12px 24px; font-size: 14px; text-transform: uppercase; border-radius: 4px; cursor: pointer;
+        }
+        .btn-buscar:hover { background-color: #66fcf1; color: #0b0c10; }
+        .grid-jugadores { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px; }
+        .card-jugador { background-color: #1f2833; border: 1px solid #2f3b4c; border-radius: 4px; padding: 24px; text-align: center; }
+        .card-jugador:hover { border-color: #66fcf1; }
+        .precio-txt { color: #66fcf1; font-size: 20px; font-weight: 700; margin-bottom: 20px; }
+        .btn-add { display: block; background-color: transparent; color: #ffffff; border: 1px solid #2f3b4c; padding: 10px; text-decoration: none; font-size: 13px; text-transform: uppercase; border-radius: 4px; }
+        .btn-add:hover { background-color: #1f2833; border-color: #ffffff; }
+
+        /* 🛡️ TABLA DE EQUIPOS Y LIGAS */
+        .tabla-contenedor { max-width: 600px; background-color: #1f2833; border: 1px solid #2f3b4c; border-radius: 4px; }
+        .fila-item { display: flex; justify-content: space-between; padding: 18px 24px; border-bottom: 1px solid #2f3b4c; }
+        .fila-item:last-child { border-bottom: none; }
+
+        .tarjeta-equipo {
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            color: #fff; 
+            text-decoration: none; 
+            font-size: 13px; 
+            padding: 12px 16px; 
+            border-radius: 4px; 
+            font-weight: 500; 
+            text-transform: uppercase; 
             transition: all 0.2s;
         }
-        .btn-añadir:hover {
-            background-color: #3498db;
-            color: white;
+        .equipo-normal { background-color: #0b0c10; border: 1px solid #2f3b4c; }
+        .equipo-seleccionado { background-color: #2f3b4c; border: 1px solid #66fcf1; }
+        .tarjeta-equipo:hover { border-color: #66fcf1 !important; }
+
+        .grid-plantilla-equipo { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px; margin-top: 20px; }
+        .tarjeta-miembro { background-color: #1f2833; border: 1px solid #2f3b4c; border-radius: 6px; padding: 20px; text-align: center; transition: transform 0.2s, border-color 0.2s; }
+        .tarjeta-miembro:hover { border-color: #66fcf1; transform: translateY(-4px); }
+        .foto-futbolista { width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 3px solid #2f3b4c; background-color: #0b0c10; margin: 0 auto 15px auto; display: block; }
+        .tarjeta-miembro:hover .foto-futbolista { border-color: #66fcf1; }
+
+        /* 🎮 ESTILOS EXCLUSIVOS PARA EL JUEGO "EQUIPO IDEAL" */
+        .dashboard-juego {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 30px;
+            margin-top: 20px;
         }
+        .marcador-finanzas {
+            background-color: #1f2833;
+            border: 1px solid #2f3b4c;
+            border-radius: 6px;
+            padding: 20px;
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 25px;
+        }
+        .dato-financiero { text-align: center; }
+        .dato-financiero span { font-size: 11px; text-transform: uppercase; color: #7f8c8d; }
+        .dato-financiero div { font-size: 22px; font-weight: bold; margin-top: 5px; }
+
+        .cancha-futbol {
+            background: linear-gradient(135deg, #1e4620 25%, #143516 100%);
+            border: 4px solid #ffffff;
+            border-radius: 8px;
+            position: relative;
+            padding: 20px;
+            min-height: 550px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-shadow: inset 0 0 40px rgba(0,0,0,0.5);
+        }
+        .linea-medio {
+            position: absolute;
+            top: 50%; left: 0; right: 0;
+            height: 2px; background-color: rgba(255,255,255,0.4);
+        }
+        .circulo-medio {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100px; height: 100px;
+            border: 2px solid rgba(255,255,255,0.4);
+            border-radius: 50%;
+        }
+        .linea-posicion {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            z-index: 2;
+            flex-wrap: wrap;
+        }
+        .jugador-posicionado {
+            background-color: rgba(11, 12, 16, 0.85);
+            border: 2px solid #66fcf1;
+            border-radius: 6px;
+            padding: 8px;
+            width: 110px;
+            text-align: center;
+            font-size: 11px;
+            color: #fff;
+        }
+        .jugador-posicionado img {
+            width: 45px; height: 45px; border-radius: 50%; object-fit: cover; margin-bottom: 4px; border: 1px solid #66fcf1;
+        }
+        .lista-reservas {
+            background-color: #1f2833; border: 1px solid #2f3b4c; border-radius: 6px; padding: 20px;
+        }
+
+        /* 📊 ESTILOS DE TABLAS PARA ESTADÍSTICAS DE LIGA */
+        .grid-estadisticas {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 30px;
+            align-items: start;
+        }
+        .bloque-tabla {
+            background-color: #1f2833;
+            border: 1px solid #2f3b4c;
+            border-radius: 6px;
+            padding: 24px;
+        }
+        .tabla-stats {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 14px;
+        }
+        .tabla-stats th {
+            padding: 12px;
+            border-bottom: 2px solid #2f3b4c;
+            color: #66fcf1;
+            text-transform: uppercase;
+            font-size: 11px;
+            letter-spacing: 0.05em;
+        }
+        .tabla-stats td {
+            padding: 12px;
+            border-bottom: 1px solid #2f3b4c;
+            color: #ffffff;
+        }
+        .tabla-stats tr:last-child td { border-bottom: none; }
+        .col-destacada { color: #66fcf1 !important; font-weight: bold; }
+        .ranking-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #2f3b4c;
+            font-size: 13px;
+        }
+        .ranking-item:last-child { border-bottom: none; }
     </style>
 </head>
 <body>
 
-    <h1>MERCADO DE FICHAJES</h1>
+    {% if seccion == 'jugadores' %}
+        <a href="{% url 'home' %}" class="btn-volver">← Volver al menú principal</a>
+        <h1>Mercado de Fichajes</h1>
 
-    <div class="grid-jugadores">
-        {% for jugador in page_obj %}
-            <div class="card-jugador">
-                
-                <div class="contenedor-foto">
-                    {% if jugador.foto %}
-                        <img src="{{ jugador.foto.url }}" alt="{{ jugador.nombre }}" class="foto-perfil">
-                    {% else %}
-                        <div class="sin-foto">N/A</div>
+        <form method="GET" action="{% url 'home' %}" class="buscador-form">
+            <input type="hidden" name="ver" value="jugadores">
+            <input type="text" name="q" value="{{ query|default:'' }}" placeholder="Buscar por nombre o posición..." class="input-txt">
+            <select name="liga" class="select-box">
+                <option value="">Todas las Ligas</option>
+                {% for l in ligas %}
+                    <option value="{{ l.id }}" {% if request.GET.liga == l.id|stringformat:"s" %}selected{% endif %}>{{ l.nombre }}</option>
+                {% endfor %}
+            </select>
+            <button type="submit" class="btn-buscar">Filtrar</button>
+        </form>
+
+        <div class="grid-jugadores">
+            {% for jugador in page_obj %}
+                <div class="card-jugador">
+                    {% if jugador.imagen %}
+                        <img src="{{ jugador.imagen.url }}" class="foto-futbolista" style="width:90px; height:90px; margin-bottom:10px;">
+                    {% elif jugador.foto %}
+                        <img src="{{ jugador.foto.url }}" class="foto-futbolista" style="width:90px; height:90px; margin-bottom:10px;">
                     {% endif %}
+                    <div style="color: #fff; font-size: 18px; font-weight: 600; text-transform: uppercase; margin-bottom: 5px;">{{ jugador.nombre }}</div>
+                    <div style="color: #7f8c8d; font-size: 12px; text-transform: uppercase; margin-bottom: 15px;">{{ jugador.posicion }} // {{ jugador.equipo.nombre }}</div>
+                    <div class="precio-txt">${{ jugador.precio|intcomma }}</div>
+                    <a href="{% url 'agregar_ideal' jugador.id %}" class="btn-add">+ Fichar para Equipo Ideal</a>
+                </div>
+            {% empty %}
+                <p style="color: #454545;">No se encontraron registros de jugadores.</p>
+            {% endfor %}
+        </div>
+
+    {% elif seccion == 'mi_dream_team' %}
+        <a href="{% url 'home' %}" class="btn-volver">← Volver al menú principal</a>
+        <h1>Mi Equipo Ideal</h1>
+        <p style="color: #7f8c8d; font-size: 13px; text-transform: uppercase; margin-bottom: 25px;">Gestiona tu presupuesto de 1,100M y posiciona a tus fichajes en el terreno de juego</p>
+
+        <div style="display: flex; gap: 10px; margin-bottom: 25px;">
+            <a href="{% url 'home' %}?ver=jugadores" class="btn-add" style="text-align: center; border-color: #66fcf1; color: #66fcf1; padding: 10px 20px; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 13px;">
+                🔍 Mercado de Fichajes
+            </a>
+            <a href="{% url 'home' %}?ver=ver_equipos" class="btn-add" style="text-align: center; border-color: #f1c40f; color: #f1c40f; padding: 10px 20px; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 13px;">
+                🏢 Explorador de Clubes
+            </a>
+        </div>
+
+        <div class="marcador-finanzas">
+            <div class="dato-financiero">
+                <span>Presupuesto Club</span>
+                <div style="color: #fff;">${{ presupuesto_total|intcomma }}</div>
+            </div>
+            <div class="dato-financiero">
+                <span>Inversión en Plantilla</span>
+                <div style="color: #f1c40f;">-${{ valor_equipo|intcomma }}</div>
+            </div>
+            <div class="dato-financiero">
+                <span>Fondos Disponibles</span>
+                {% if presupuesto_restante < 0 %}
+                    <div style="color: #e74c3c;">
+                        ${{ presupuesto_restante|intcomma }}
+                    </div>
+                {% else %}
+                    <div style="color: #2ecc71;">
+                        ${{ presupuesto_restante|intcomma }}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="dashboard-juego">
+            
+            <div class="cancha-futbol">
+                <div class="linea-medio"></div>
+                <div class="circulo-medio"></div>
+
+                <div class="linea-posicion">
+                    {% for j in jugadores_fichados %}
+                        {% if 'delantero' in j.posicion|lower or 'extremo' in j.posicion|lower %}
+                            <div class="jugador-posicionado">
+                                <img src="{% if j.foto %}{{ j.foto.url }}{% elif j.imagen %}{{ j.imagen.url }}{% else %}https://via.placeholder.com/50/0b0c10/66fcf1?text=⚽{% endif %}">
+                                <div><b>{{ j.nombre }}</b></div>
+                                <div style="color: #f1c40f; font-size: 9px;">DELANTERO</div>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
                 </div>
 
-                <div class="nombre">{{ jugador.nombre }}</div>
-                <div class="posicion">{{ jugador.posicion }}</div>
-                <div class="precio">${{ jugador.precio }}</div>
+                <div class="linea-posicion">
+                    {% for j in jugadores_fichados %}
+                        {% if 'medio' in j.posicion|lower or 'volante' in j.posicion|lower or 'centrocampista' in j.posicion|lower or 'pivote' in j.posicion|lower %}
+                            <div class="jugador-posicionado" style="border-color: #f1c40f;">
+                                <img src="{% if j.foto %}{{ j.foto.url }}{% elif j.imagen %}{{ j.imagen.url }}{% else %}https://via.placeholder.com/50/0b0c10/66fcf1?text=🏃{% endif %}">
+                                <div><b>{{ j.nombre }}</b></div>
+                                <div style="color: #66fcf1; font-size: 9px;">MEDIO</div>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+
+                <div class="linea-posicion">
+                    {% for j in jugadores_fichados %}
+                        {% if 'defensa' in j.posicion|lower or 'lateral' in j.posicion|lower or 'central' in j.posicion|lower or 'carrilero' in j.posicion|lower %}
+                            <div class="jugador-posicionado" style="border-color: #e74c3c;">
+                                <img src="{% if j.foto %}{{ j.foto.url }}{% elif j.imagen %}{{ j.imagen.url }}{% else %}https://via.placeholder.com/50/0b0c10/66fcf1?text=🛡️{% endif %}">
+                                <div><b>{{ j.nombre }}</b></div>
+                                <div style="color: #e74c3c; font-size: 9px;">DEFENSA</div>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+
+                <div class="linea-posicion">
+                    {% for j in jugadores_fichados %}
+                        {% if 'portero' in j.posicion|lower or 'arquero' in j.posicion|lower or 'guardameta' in j.posicion|lower %}
+                            <div class="jugador-posicionado" style="border-color: #2ecc71;">
+                                <img src="{% if j.foto %}{{ j.foto.url }}{% elif j.imagen %}{{ j.imagen.url }}{% else %}https://via.placeholder.com/50/0b0c10/2ecc71?text=🧤{% endif %}">
+                                <div><b>{{ j.nombre }}</b></div>
+                                <div style="color: #2ecc71; font-size: 9px;">PORTERO</div>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="lista-reservas">
+                <h3 style="color:#66fcf1; margin-top:0; font-size:14px; text-transform:uppercase; border-bottom:1px solid #2f3b4c; padding-bottom:8px;">
+                    Fichados ({{ jugadores_fichados|length }})
+                </h3>
                 
-                <a href="{% url 'add_to_cart' jugador.id %}" class="btn-añadir">
-                    🛒 Añadir
+                <div style="display:flex; flex-direction:column; gap:10px; max-height:450px; overflow-y:auto;">
+                    {% for jug in jugadores_fichados %}
+                        <div style="font-size:12px; background-color:#0b0c10; padding:10px; border-radius:4px; display:flex; justify-content:space-between; align-items:center;">
+                            <div>
+                                <div style="color:#fff; font-weight:bold;">{{ jug.nombre }}</div>
+                                <div style="color:#7f8c8d; font-size:10px;">{{ jug.posicion }}</div>
+                            </div>
+                            
+                            <div style="display: flex; align-items: center; gap: 12px;">
+                                <span style="color:#66fcf1; font-weight:bold;">${{ jug.precio|intcomma }}</span>
+                                
+                                <a href="{% url 'eliminar_ideal' jug.id %}" 
+                                   style="color: #e74c3c; text-decoration: none; font-weight: bold; font-size: 14px; padding: 0 5px; transition: 0.2s;" 
+                                   title="Eliminar jugador"
+                                   onmouseover="this.style.color='#c0392b'" 
+                                   onmouseout="this.style.color='#e74c3c'">
+                                    ✕
+                                </a>
+                            </div>
+                        </div>
+                    {% empty %}
+                        <p style="color:#454545; font-size:12px; font-style:italic; text-align: center; margin: 20px 0;">
+                            No has comprado ningún jugador aún. Usa los botones de arriba para ir al mercado.
+                        </p>
+                    {% endfor %}
+                </div>
+                
+                <a href="{% url 'home' %}?ver=jugadores" class="btn-add" style="margin-top:20px; text-align:center; border-color:#66fcf1; color:#66fcf1; display: block; text-decoration: none;">
+                    + Buscar más jugadores
                 </a>
             </div>
-        {% empty %}
-            <p style="text-align: center; grid-column: 1/-1; color: #7f8c8d;">No hay jugadores registrados actualmente.</p>
-        {% endfor %}
-    </div>
+
+        </div>
+
+    {% elif seccion == 'ver_equipos' or seccion == 'detalle_equipo' %}
+        <a href="{% url 'home' %}" class="btn-volver">← Volver al menú principal</a>
+        <h1>Explorador de Clubes</h1>
+        <p style="color: #454545; font-size: 13px; text-transform: uppercase; margin-bottom: 30px; letter-spacing: 0.1em;">
+            Selecciona un club para desplegar su plantilla oficial de jugadores
+        </p>
+
+        <div style="display: flex; gap: 20px; justify-content: space-between; flex-wrap: wrap; margin-bottom: 40px; width: 100%;">
+            <div style="flex: 1; min-width: 280px; background-color: #1f2833; border: 1px solid #2f3b4c; border-radius: 4px; padding: 20px;">
+                <h3 style="color: #66fcf1; margin-top: 0; text-transform: uppercase; font-size: 13px; letter-spacing: 0.05em; border-bottom: 1px solid #2f3b4c; padding-bottom: 10px; margin-bottom: 15px;">
+                    🏴󠁧󠁢󠁥󠁮󠁧󠁿 Premier League
+                </h3>
+                <div style="display: flex; flex-direction: column; gap: 8px;">
+                    {% for eq in equipos_premier %}
+                        <a href="{% url 'home' %}?ver=detalle_equipo&equipo={{ eq.id }}" 
+                           class="tarjeta-equipo {% if equipo_seleccionado.id|stringformat:'s' == eq.id|stringformat:'s' %}equipo-seleccionado{% else %}equipo-normal{% endif %}">
+                            <span>🛡️ {{ eq.nombre }}</span>
+                            <small style="color: #7f8c8d; font-size: 10px;">{{ eq.ciudad }}</small>
+                        </a>
+                    {% empty %}
+                        <div style="color: #454545; font-size: 12px; font-style: italic;">Sin equipos en esta liga.</div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div style="flex: 1; min-width: 280px; background-color: #1f2833; border: 1px solid #2f3b4c; border-radius: 4px; padding: 20px;">
+                <h3 style="color: #66fcf1; margin-top: 0; text-transform: uppercase; font-size: 13px; letter-spacing: 0.05em; border-bottom: 1px solid #2f3b4c; padding-bottom: 10px; margin-bottom: 15px;">
+                    🇪🇸 LaLiga
+                </h3>
+                <div style="display: flex; flex-direction: column; gap: 8px;">
+                    {% for eq in equipos_laliga %}
+                        <a href="{% url 'home' %}?ver=detalle_equipo&equipo={{ eq.id }}" 
+                           class="tarjeta-equipo {% if equipo_seleccionado.id|stringformat:'s' == eq.id|stringformat:'s' %}equipo-seleccionado{% else %}equipo-normal{% endif %}">
+                            <span>🛡️ {{ eq.nombre }}</span>
+                            <small style="color: #7f8c8d; font-size: 10px;">{{ eq.ciudad }}</small>
+                        </a>
+                    {% empty %}
+                        <div style="color: #454545; font-size: 12px; font-style: italic;">Sin equipos en esta liga.</div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        {% if equipo_seleccionado %}
+            <h2 style="color: #ffffff; font-size: 20px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-top: 40px; margin-bottom: 15px;">
+                🛡️ Plantilla Oficial: <span style="color: #66fcf1;">{{ equipo_seleccionado.nombre }}</span>
+            </h2>
+            
+            <div class="grid-plantilla-equipo">
+                {% for jugador in jugadores_equipo_seleccionado %}
+                    <div class="tarjeta-miembro">
+                        {% if jugador.imagen %}
+                            <img src="{{ jugador.imagen.url }}" alt="{{ jugador.nombre }}" class="foto-futbolista">
+                        {% elif jugador.foto %}
+                            <img src="{{ jugador.foto.url }}" alt="{{ jugador.nombre }}" class="foto-futbolista">
+                        {% else %}
+                            <img src="https://via.placeholder.com/120/0b0c10/66fcf1?text=🏃‍♂️" alt="Sin foto" class="foto-futbolista">
+                        {% endif %}
+
+                        <div style="color: #fff; font-size: 16px; font-weight: 600; text-transform: uppercase; margin-bottom: 4px;">{{ jugador.nombre }}</div>
+                        <div style="color: #7f8c8d; font-size: 11px; text-transform: uppercase; margin-bottom: 12px;">⚽ {{ jugador.posicion }}</div>
+                        <div style="color: #66fcf1; font-size: 18px; font-weight: 700; margin-bottom: 15px;">${{ jugador.precio|intcomma }}</div>
+                        <a href="{% url 'add_to_cart' jugador.id %}" class="btn-add" style="font-size: 11px; padding: 8px;">+ Fichar</a>
+                    </div>
+                {% empty %}
+                    <p style="color: #454545; grid-column: 1 / -1; text-align: center; font-style: italic; padding: 20px;">No hay jugadores registrados.</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+    {% elif seccion == 'ligas' %}
+        <a href="{% url 'home' %}" class="btn-volver">← Volver al menú principal</a>
+        <h1>Ligas Oficiales</h1>
+        <p style="color: #454545; font-size: 13px; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 25px;">Selecciona una competencia para desplegar su panel de control completo</p>
+        <div class="tabla-contenedor" style="max-width: 450px; background-color: transparent; border: none;">
+            <div style="display: flex; flex-direction: column; gap: 12px;">
+                {% for l in ligas %}
+                    <a href="{% url 'home' %}?ver=liga_detalle&liga={{ l.id }}" class="btn-menu" style="text-align: left; display: flex; align-items: center; justify-content: space-between;">
+                        <span>🏆 {{ l.nombre }}</span>
+                        <span style="font-size: 11px; color: #66fcf1; letter-spacing: 0.05em; text-transform: uppercase;">Ver Estadísticas →</span>
+                    </a>
+                {% empty %}
+                    <div class="fila-item" style="color: #454545; background-color: #1f2833; border: 1px solid #2f3b4c; border-radius: 4px; justify-content: center;">No hay ligas dadas de alta.</div>
+                {% endfor %}
+            </div>
+        </div>
+
+    {% elif seccion == 'liga_detalle' %}
+        <a href="{% url 'home' %}?ver=ligas" class="btn-volver">← Volver a todas las ligas</a>
+        <h1 style="color: #66fcf1;">🏆 {{ liga_seleccionada.nombre }}</h1>
+        <p style="color: #7f8c8d; font-size: 12px; text-transform: uppercase; margin-bottom: 30px;">Clubes Integrantes y Líderes de Rendimiento</p>
+        
+        {% if liga_seleccionada %}
+            <div class="grid-estadisticas">
+                
+                <div class="bloque-tabla">
+                    <h3 style="color: #fff; margin-top: 0; margin-bottom: 20px; font-size: 16px; text-transform: uppercase; letter-spacing: 0.05em;">Clubes en la Competición</h3>
+                    <table class="tabla-stats">
+                        <thead>
+                            <tr>
+                                <th style="width: 60px;">#</th>
+                                <th>Club</th>
+                                <th style="text-align: right;">Ciudad / Sede</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for eq in tabla_posiciones %}
+                                <tr>
+                                    <td>{{ forloop.counter }}</td>
+                                    <td style="font-weight: bold; color: #ffffff;">🛡️ {{ eq.nombre }}</td>
+                                    <td style="text-align: right; color: #66fcf1;">{{ eq.ciudad|default:"No especificada" }}</td>
+                                </tr>
+                            {% empty %}
+                                <tr>
+                                    <td colspan="3" style="text-align: center; color: #454545; padding: 20px; font-style: italic;">No hay equipos registrados en esta liga.</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <div style="display: flex; flex-direction: column; gap: 20px;">
+                    
+                    <div class="bloque-tabla" style="padding: 20px;">
+                        <h3 style="color: #f1c40f; margin-top: 0; margin-bottom: 15px; font-size: 14px; text-transform: uppercase; letter-spacing: 0.05em;">⚽ Top Goleadores</h3>
+                        {% for jug in goleadores %}
+                            <div class="ranking-item">
+                                <span style="color: #fff;"><b>{{ forloop.counter }}.</b> {{ jug.nombre }}</span>
+                                <span style="color: #f1c40f; font-weight: bold;">{{ jug.total_goles }} G</span>
+                            </div>
+                        {% empty %}
+                            <p style="color: #454545; font-size: 12px; font-style: italic;">Sin datos de goleadores.</p>
+                        {% endfor %}
+                    </div>
+
+                    <div class="bloque-tabla" style="padding: 20px;">
+                        <h3 style="color: #2ecc71; margin-top: 0; margin-bottom: 15px; font-size: 14px; text-transform: uppercase; letter-spacing: 0.05em;">👟 Top Asistencias</h3>
+                        {% for jug in asistidores %}
+                            <div class="ranking-item">
+                                <span style="color: #fff;"><b>{{ forloop.counter }}.</b> {{ jug.nombre }}</span>
+                                <span style="color: #2ecc71; font-weight: bold;">{{ jug.total_asistencias }} A</span>
+                            </div>
+                        {% empty %}
+                            <p style="color: #454545; font-size: 12px; font-style: italic;">Sin datos de asistencias.</p>
+                        {% endfor %}
+                    </div>
+
+                </div>
+
+            </div>
+        {% else %}
+            <p style="color: #e74c3c;">Error crítico: No se cargaron los datos de la liga seleccionada.</p>
+        {% endif %}
+
+    {% else %}
+        <div class="contenedor-auth">
+            {% if user.is_authenticated %}
+                <div class="usuario-saludo">// {{ user.username }}</div>
+                <a href="{% url 'logout' %}" class="btn-auth">Cerrar Sesión</a>
+            {% else %}
+                <a href="{% url 'login' %}" class="btn-auth">Iniciar Sesión</a>
+                <a href="{% url 'register' %}" style="font-size: 11px; color: #66fcf1; text-decoration: none;">Crear cuenta</a>
+            {% endif %}
+        </div>
+
+        <div class="menu-central">
+            <h1>Sport Stats</h1>
+            <p style="color: #454545; font-size: 13px; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 50px;">Data & Administration Hub</p>
+
+            <div class="grupo-botones">
+                <a href="{% url 'home' %}?ver=mi_dream_team" class="btn-menu btn-juego">🎮 Jugar: Equipo Ideal</a>
+                <a href="{% url 'home' %}?ver=jugadores" class="btn-menu">Ver Mercado de Fichajes</a>
+                <a href="{% url 'home' %}?ver=ver_equipos" class="btn-menu">Explorador de Clubes</a>
+                <a href="{% url 'home' %}?ver=ligas" class="btn-menu">Panel de Ligas Oficiales</a>
+            </div>
+        </div>
+    {% endif %}
 
 </body>
 </html>

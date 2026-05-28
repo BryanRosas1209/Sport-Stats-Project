@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Explorador de Clubes - Sport Stats</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: #0b0c10; color: #c5c6c7; margin: 0; padding: 40px; min-height: 100vh;
+        }
+        .btn-volver {
+            color: #66fcf1; text-decoration: none; font-size: 13px; text-transform: uppercase;
+            letter-spacing: 0.05em; display: inline-block; margin-bottom: 30px;
+        }
+        h1 { color: #ffffff; font-size: 28px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.15em; margin-bottom: 6px; }
+        .tarjeta-equipo {
+            display: flex; justify-content: space-between; align-items: center; color: #fff; 
+            text-decoration: none; font-size: 13px; padding: 12px 16px; border-radius: 4px; 
+            text-transform: uppercase; transition: all 0.2s;
+        }
+        .equipo-normal { background-color: #0b0c10; border: 1px solid #2f3b4c; }
+        .equipo-seleccionado { background-color: #2f3b4c; border: 1px solid #66fcf1; }
+        .tarjeta-equipo:hover { border-color: #66fcf1 !important; }
+        .tabla-contenedor { background-color: #1f2833; border: 1px solid #2f3b4c; border-radius: 4px; width: 100%; margin-top: 20px; }
+    </style>
+</head>
+<body>
+
+    <a href="{% url 'home' %}" class="btn-volver">← Volver al menú principal</a>
+    <h1>Explorador de Clubes</h1>
+    <p style="color: #454545; font-size: 13px; text-transform: uppercase; margin-bottom: 30px; letter-spacing: 0.1em;">
+        Selecciona un club para desplegar su plantilla oficial de jugadores
+    </p>
+
+    <div style="display: flex; gap: 20px; justify-content: space-between; flex-wrap: wrap; margin-bottom: 40px;">
+        
+        <div style="flex: 1; min-width: 280px; background-color: #1f2833; border: 1px solid #2f3b4c; border-radius: 4px; padding: 20px;">
+            <h3 style="color: #66fcf1; margin-top: 0; text-transform: uppercase; font-size: 13px; border-bottom: 1px solid #2f3b4c; padding-bottom: 10px; margin-bottom: 15px;">
+                🏴󠁧󠁢󠁥󠁮󠁧󠁿 Premier League
+            </h3>
+            <div style="display: flex; flex-direction: column; gap: 8px;">
+                {% for eq in equipos_premier %}
+                    <a href="{% url 'detalle_equipo' eq.id %}" 
+                       class="tarjeta-equipo {% if equipo_seleccionado.id == eq.id %}equipo-seleccionado{% else %}equipo-normal{% endif %}">
+                        <span>🛡️ {{ eq.nombre }}</span>
+                        <small style="color: #7f8c8d; font-size: 10px;">{{ eq.ciudad }}</small>
+                    </a>
+                {% empty %}
+                    <div style="color: #454545; font-size: 12px;">Sin equipos en esta liga.</div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div style="flex: 1; min-width: 280px; background-color: #1f2833; border: 1px solid #2f3b4c; border-radius: 4px; padding: 20px;">
+            <h3 style="color: #66fcf1; margin-top: 0; text-transform: uppercase; font-size: 13px; border-bottom: 1px solid #2f3b4c; padding-bottom: 10px; margin-bottom: 15px;">
+                🇪🇸 LaLiga
+            </h3>
+            <div style="display: flex; flex-direction: column; gap: 8px;">
+                {% for eq in equipos_laliga %}
+                    <a href="{% url 'detalle_equipo' eq.id %}" 
+                       class="tarjeta-equipo {% if equipo_seleccionado.id == eq.id %}equipo-seleccionado{% else %}equipo-normal{% endif %}">
+                        <span>🛡️ {{ eq.nombre }}</span>
+                        <small style="color: #7f8c8d; font-size: 10px;">{{ eq.ciudad }}</small>
+                    </a>
+                {% empty %}
+                    <div style="color: #454545; font-size: 12px;">Sin equipos en esta liga.</div>
+                {% endfor %}
+            </div>
+        </div>
+
+    </div>
+
+    {% if equipo_seleccionado %}
+        <h2 style="color: #ffffff; font-size: 20px; text-transform: uppercase; margin-top: 40px; margin-bottom: 15px;">
+            🏃‍♂️ Plantilla Oficial: <span style="color: #66fcf1;">{{ equipo_seleccionado.nombre }}</span>
+        </h2>
+        
+        <div class="tabla-contenedor">
+            <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 14px; color: #c5c6c7;">
+                <thead>
+                    <tr style="color: #66fcf1; font-size: 11px; text-transform: uppercase; border-bottom: 1px solid #2f3b4c; background-color: #151c24;">
+                        <th style="padding: 14px 20px;">Nombre del Futbolista</th>
+                        <th style="padding: 14px 20px;">Posición</th>
+                        <th style="padding: 14px 20px; text-align: right;">Precio Mercado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for jugador in jugadores_equipo_seleccionado %}
+                        <tr style="border-bottom: 1px solid #1a222d;">
+                            <td style="padding: 14px 20px; color: #fff; font-weight: 500;">⚡ {{ jugador.nombre }}</td>
+                            <td style="padding: 14px 20px; text-transform: uppercase; font-size: 12px; color: #7f8c8d;">{{ jugador.posicion }}</td>
+                            <td style="padding: 14px 20px; text-align: right; font-weight: bold; color: #66fcf1;">${{ jugador.precio }}</td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="3" style="padding: 25px; text-align: center; color: #454545; font-style: italic;">
+                                No hay jugadores registrados en esta escuadra.
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% endif %}
+
+</body>
+</html>

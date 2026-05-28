@@ -1,0 +1,30 @@
+<h2 style="color: #ffffff; font-size: 20px; text-transform: uppercase; margin-top: 40px; margin-bottom: 15px;">
+    🏃‍♂️ Plantilla Oficial: <span style="color: #66fcf1;">{{ equipo_seleccionado.nombre }}</span>
+</h2>
+
+<div style="background-color: #1f2833; border: 1px solid #2f3b4c; border-radius: 4px; width: 100%; margin-top: 20px;">
+    <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 14px; color: #c5c6c7;">
+        <thead>
+            <tr style="color: #66fcf1; font-size: 11px; text-transform: uppercase; border-bottom: 1px solid #2f3b4c; background-color: #151c24;">
+                <th style="padding: 14px 20px;">Nombre del Futbolista</th>
+                <th style="padding: 14px 20px;">Posición</th>
+                <th style="padding: 14px 20px; text-align: right;">Precio Mercado</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for jugador in jugadores_equipo_seleccionado %}
+                <tr style="border-bottom: 1px solid #1a222d;">
+                    <td style="padding: 14px 20px; color: #fff; font-weight: 500;">⚡ {{ jugador.nombre }}</td>
+                    <td style="padding: 14px 20px; text-transform: uppercase; font-size: 12px; color: #7f8c8d;">{{ jugador.posicion }}</td>
+                    <td style="padding: 14px 20px; text-align: right; font-weight: bold; color: #66fcf1;">${{ jugador.precio }}</td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="3" style="padding: 25px; text-align: center; color: #454545; font-style: italic;">
+                        No hay jugadores registrados en esta escuadra.
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>

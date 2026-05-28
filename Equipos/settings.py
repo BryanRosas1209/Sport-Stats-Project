@@ -16,9 +16,12 @@ INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
-    'django.sessions',
-    'django.messages',
-    'django.staticfiles',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    
+    'django.contrib.humanize',
+
     'Estadisticas',  # Tu aplicación local
 ]
 
@@ -32,7 +35,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'Sport_Stats_Project.urls'
+ROOT_URLCONF = 'Equipos.urls'
 
 TEMPLATES = [
     {
@@ -50,7 +53,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'Sport_Stats_Project.wsgi.application'
+WSGI_APPLICATION = 'Equipos.wsgi.application'
 
 # Base de datos
 DATABASES = {
@@ -88,3 +91,5 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+LOGIN_URL = 'login'

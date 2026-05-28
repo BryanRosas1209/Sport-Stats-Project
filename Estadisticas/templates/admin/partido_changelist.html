@@ -1,0 +1,11 @@
+{% extends "admin/change_list.html" %}
+{% load i18n %}
+
+{% block object-tools-items %}
+    <li>
+        <a href="add/" style="background-color: #e67e22 !important; color: white !important; font-weight: bold; border-radius: 4px; padding: 10px 15px; display: inline-block;">
+            🚀 Ir a Carga Masiva (Por Comas)
+        </a>
+    </li>
+    {{ block.super }}
+{% endblock %}

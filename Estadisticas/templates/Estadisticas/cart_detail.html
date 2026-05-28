@@ -7,12 +7,12 @@
     {% if cart.items.all %}
     <div class="card shadow">
         <div class="card-body">
-            <table class="table table-hover">
+            <table class="table table-hover align-middle">
                 <thead class="table-dark">
                     <tr>
-                        <th>Equipo</th>
+                        <th>Jugador / Equipo</th>
                         <th>Precio</th>
-                        <th>Cantidad</th>
+                        <th class="text-center">Cantidad</th>
                         <th>Subtotal</th>
                         <th>Acción</th>
                     </tr>
@@ -20,15 +20,17 @@
                 <tbody>
                     {% for item in cart.items.all %}
                     <tr>
-                        <td>{{ item.equipo.nombre }}</td>
-                        <td>${{ item.equipo.precio }}</td>
                         <td>
-                            <form method="POST" action="{% url 'update_cart_item' item.id %}" class="d-flex" style="width: 120px;">
-                                {% csrf_token %}
-                                <input type="number" name="quantity" value="{{ item.quantity }}" min="1" class="form-control form-control-sm me-2">
-                                <button class="btn btn-sm btn-outline-primary">ok</button>
-                            </form>
+                            <span class="fw-bold d-block text-uppercase">{{ item.jugador.nombre }}</span>
+                            <small class="text-muted text-uppercase">{{ item.jugador.equipo.nombre }}</small>
                         </td>
+                        
+                        <td>${{ item.jugador.precio }}</td>
+                        
+                        <td class="text-center">
+                            <span class="badge bg-secondary px-3 py-2 fs-6">{{ item.quantity }}</span>
+                        </td>
+                        
                         <td class="fw-bold">${{ item.subtotal }}</td>
                         <td>
                             <a href="{% url 'remove_from_cart' item.id %}" class="btn btn-danger btn-sm">Eliminar</a>
@@ -37,16 +39,21 @@
                     {% endfor %}
                 </tbody>
             </table>
+            
             <div class="text-end mt-4">
-                <h4>Total a pagar: <span class="text-success">${{ cart.total }}</span></h4>
-                <button class="btn btn-primary btn-lg mt-2">Finalizar Registro</button>
+                <h4>Total a pagar: <span class="text-success">${{ cart.get_total|default:cart.total }}</span></h4>
+                
+                <form method="POST" action="{% url 'checkout_cart' %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-primary btn-lg mt-2 px-5">Finalizar Registro</button>
+                </form>
             </div>
         </div>
     </div>
     {% else %}
     <div class="alert alert-warning text-center">
         <h4>Tu carrito está vacío.</h4>
-        <a href="{% url 'home' %}" class="btn btn-link">Volver a la lista de equipos</a>
+        <a href="{% url 'home' %}?ver=jugadores" class="btn btn-primary mt-2">Volver al Mercado de Fichajes</a>
     </div>
     {% endif %}
 </div>

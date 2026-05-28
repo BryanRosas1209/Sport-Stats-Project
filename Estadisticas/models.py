@@ -2,6 +2,7 @@
 import uuid
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import User
 
 # Función auxiliar para desinfectar strings binarios corruptos de Excel
 def limpiar_string_corrupto(valor):
@@ -100,19 +101,13 @@ class Partido(models.Model):
     fecha = models.DateTimeField()
     equipo_local = models.ForeignKey(Equipo, on_delete=models.CASCADE, related_name='partidos_local')
     equipo_visitante = models.ForeignKey(Equipo, on_delete=models.CASCADE, related_name='partidos_visitante')
-    goles_local = models.PositiveIntegerField(default=0)
-    goles_visitante = models.PositiveIntegerField(default=0)
-    torneo = models.CharField(max_length=100, blank=True)
+    goles_local = models.IntegerField(default=0)
+    goles_visitante = models.IntegerField(default=0)
+    liga = models.ForeignKey(Liga, on_delete=models.CASCADE, related_name='partidos', null=True, blank=True)
 
     def __str__(self):
-        return f"{self.equipo_local} - {self.equipo_visitante}"
-
-    def __getattribute__(self, name):
-        attr = super().__getattribute__(name)
-        if name == 'torneo':
-            return limpiar_string_corrupto(attr)
-        return attr
-
+        return f"{self.equipo_local.nombre} vs {self.equipo_visitante.nombre} ({self.liga.nombre if self.liga else 'Sin Liga'})"
+    
 # ==========================================
 # 📊 RENDIMIENTO DE PARTIDOS
 # ==========================================
@@ -179,3 +174,10 @@ class CartItem(models.Model):
 
     def __str__(self):
         return f"{self.jugador} x {self.quantity}"
+    
+class EquipoUsuario(models.Model):
+    usuario = models.OneToOneField(User, on_delete=models.CASCADE, related_name='equipo_ideal')
+    jugadores = models.ManyToManyField('Jugador', blank=True)
+
+    def __str__(self):
+        return f"Equipo Ideal de {self.usuario.username}"
