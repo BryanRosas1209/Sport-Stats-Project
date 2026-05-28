@@ -107,6 +107,7 @@ Esto permite acceder a:
 
 ## 👤 User
 
+```
  Su función es definir la estructura principal de la base de datos utilizando modelos de Django. Aquí se crean los modelos para usuarios, ligas, equipos, jugadores, partidos, estadísticas, trofeos y carrito de compras.
 
 # coding: utf-8
@@ -226,7 +227,7 @@ class CartItem(models.Model):
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
     jugador = models.ForeignKey(Jugador, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField(default=1)
-
+```
 
 Modelo de usuario personalizado con permisos especiales para editores.
 
