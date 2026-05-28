@@ -107,9 +107,9 @@ Esto permite acceder a:
 
 ## 👤 User
 
-```
- Su función es definir la estructura principal de la base de datos utilizando modelos de Django. Aquí se crean los modelos para usuarios, ligas, equipos, jugadores, partidos, estadísticas, trofeos y carrito de compras.
 
+ Su función es definir la estructura principal de la base de datos utilizando modelos de Django. Aquí se crean los modelos para usuarios, ligas, equipos, jugadores, partidos, estadísticas, trofeos y carrito de compras.
+```
 # coding: utf-8
 import uuid
 from django.db import models
@@ -478,3 +478,5 @@ python manage.py runserver
 # 📖 Conclusión
 
 Sport Stats Project es una aplicación web desarrollada en Django que permite administrar información deportiva de manera organizada, dinámica y segura. El sistema integra autenticación, administración de estadísticas, relaciones entre modelos, carga de imágenes y gestión de fichajes mediante una arquitectura basada en el patrón MVT.
+
+
