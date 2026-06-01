@@ -181,3 +181,4 @@ class EquipoUsuario(models.Model):
 
     def __str__(self):
         return f"Equipo Ideal de {self.usuario.username}"
+    

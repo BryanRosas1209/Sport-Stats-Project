@@ -14,6 +14,10 @@ urlpatterns = [
     path('agregar-ideal/<uuid:jugador_id>/', views.agregar_al_equipo_ideal, name='agregar_ideal'), 
     # Nota: Si tus IDs de jugador no usan UUID sino números, cambia <uuid:jugador_id> por <int:jugador_id>
 
+    path('panel/rendimiento-masivo/', views.rendimiento_carga_masiva, name='rendimiento_carga_masiva'),
+
+    path('panel/importar-rendimiento/', views.rendimiento_carga_masiva, name='rendimiento_carga_masiva'),
+
     path('eliminar-ideal/<uuid:jugador_id>/', views.eliminar_del_equipo_ideal, name='eliminar_ideal'),
 
     # ⚽ NUEVO: Explorador de Equipos Independiente (Rutas Limpias)

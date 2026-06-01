@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from .models import User, Jugador, Equipo, Liga
+from .models import Partido
 
 # 👤 USUARIOS
 class CustomUserCreationForm(UserCreationForm):
@@ -81,4 +82,19 @@ class ImportarPartidosForm(forms.Form):
             'style': 'width:100%; background-color:#1f2833; color:#fff; border:1px solid #2f3b4c; padding:12px; border-radius:4px; font-family:monospace; box-sizing: border-box;'
         }),
         label="Datos de los partidos (puedes pegar filas desde Excel o usar comas)"
+    )
+
+class ImportarRendimientoForm(forms.Form):
+    partido = forms.ModelChoiceField(
+        queryset=Partido.objects.all().order_by('-fecha'),
+        label="Seleccionar Partido",
+        widget=forms.Select(attrs={'class': 'form-select bg-secondary text-white border-0'})
+    )
+    rendimiento_pegado = forms.CharField(
+        label="Datos de Rendimiento",
+        widget=forms.Textarea(attrs={
+            'class': 'form-control bg-secondary text-white border-0',
+            'placeholder': 'Ejemplo:\nLionel Messi, 2, 1, 0, 0\nLuis Suárez, 1, 0, 1, 0',
+            'rows': 6
+        })
     )
