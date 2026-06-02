@@ -1,8 +1,65 @@
 # ⚽ Sport Stats Project
+### CBTIS 116 — General Vicente Guerrero
+### Implementa Base De Datos Relacionales En Sistema de Información
+### Proyecto Final — Equipo 9
 
-Proyecto web desarrollado con Django para la administración de estadísticas deportivas, equipos, jugadores y fichajes.
+**Docente:** Jose Christian Romero Hernandez
 
-El sistema permite gestionar información relacionada con ligas deportivas, jugadores, equipos, partidos, estadísticas individuales y un sistema de carrito de fichajes, utilizando una interfaz dinámica y organizada.
+**Integrantes:**
+- Rosas Varela Bryan Irvin
+- Ríos Flores Alan Samuel
+- Jovani Rojas Huerta
+- Corona Larrinaga Marco Antonio
+- Vinalay López Romina Cristal
+
+**4AVPG — Tijuana, B.C., 28 de marzo del 2026**
+
+---
+
+# 📋 Índice
+
+1. Introducción
+2. Desarrollo
+   - 2.1 Arquitectura General del Sistema
+   - 2.2 Explicación del Archivo settings.py
+   - 2.3 Explicación del Archivo urls.py
+   - 2.4 Diseño de la Base de Datos
+   - 2.5 Explicación de los Models
+   - 2.6 Relaciones entre los Models
+   - 2.7 Funcionamiento del Django Admin
+   - 2.8 Entrada, Actualización y Eliminación de Datos
+   - 2.9 Explicación de las Views
+   - 2.10 Interacción entre URLs, Views y Templates
+   - 2.11 Templates e Interfaz de Usuario
+3. Conclusiones Finales
+
+---
+
+# 📖 Introducción
+
+El presente proyecto consiste en el desarrollo de una aplicación web deportiva llamada **Sport Stats Project**, creada utilizando el framework Django de Python. La finalidad principal del sistema es administrar información relacionada con ligas, equipos, jugadores, partidos, estadísticas deportivas y un sistema de fichajes mediante un carrito de compras interactivo.
+
+La aplicación fue diseñada para funcionar como una plataforma dinámica y organizada donde los usuarios pueden consultar información deportiva de manera sencilla, mientras que los administradores y usuarios editores tienen la capacidad de gestionar y modificar los datos desde el panel administrativo del sistema.
+
+El proyecto implementa el patrón de arquitectura **MVT (Model - View - Template)** utilizado por Django, permitiendo separar la lógica del sistema, la estructura de la base de datos y la interfaz visual para mantener un desarrollo más limpio, seguro y fácil de mantener.
+
+Dentro del sistema se pueden realizar diferentes funciones como registrar jugadores, crear equipos, administrar ligas deportivas, registrar partidos, actualizar estadísticas, cargar imágenes de jugadores y escudos de equipos, además de permitir la autenticación de usuarios mediante inicio de sesión y registro personalizado.
+
+La base de datos fue desarrollada utilizando **SQLite3**, permitiendo almacenar toda la información del sistema de manera estructurada mediante relaciones entre modelos. Además, se implementó un modelo de usuario personalizado para controlar permisos especiales dentro de la plataforma, diferenciando usuarios normales de usuarios editores.
+
+Por otra parte, el proyecto incorpora el uso del panel administrativo de Django, facilitando operaciones **CRUD (Create, Read, Update y Delete)** para administrar toda la información sin necesidad de manipular directamente la base de datos.
+
+---
+
+# 🛠 Tecnologías Utilizadas
+
+- Python
+- Django
+- SQLite3
+- HTML5
+- CSS3
+- JavaScript
+- Bootstrap
 
 ---
 
@@ -21,95 +78,197 @@ El sistema permite gestionar información relacionada con ligas deportivas, juga
 
 ---
 
-# 🛠 Tecnologías Utilizadas
+# 💻 Desarrollo
 
-- Python
-- Django
-- SQLite3
-- HTML5
-- CSS3
-- JavaScript
-- Bootstrap
+El presente proyecto fue desarrollado utilizando Django, un framework web basado en Python que permite crear aplicaciones dinámicas, organizadas y seguras mediante el patrón de arquitectura MVT (Model - View - Template).
 
----
+El sistema desarrollado corresponde a una plataforma deportiva llamada **Sport Stats Project**, cuya finalidad principal es administrar información relacionada con equipos, jugadores, partidos, ligas deportivas, estadísticas individuales, trofeos y un sistema de fichajes mediante un mercado de compras.
 
-# 📂 Estructura General del Proyecto
+La aplicación principal del sistema recibe el nombre de **Estadisticas**, mientras que el proyecto general se llama **Sport_Stats_Project**.
 
-```plaintext
-Sport_Stats_Project/
-│
-├── Estadisticas/
-│   ├── models.py
-│   ├── views.py
-│   ├── urls.py
-│   ├── forms.py
-│   ├── templates/
-│   └── static/
-│
-├── media/
-├── static/
-├── db.sqlite3
-├── manage.py
-└── README.md
-```
+El sistema fue diseñado para que diferentes usuarios puedan interactuar con la plataforma dependiendo de sus permisos:
+
+- **Usuarios editores:** tienen permisos especiales para registrar jugadores, equipos, modificar información y administrar contenido desde el panel del sistema.
+- **Usuarios normales:** solo tienen acceso a la plataforma para buscar o seleccionar jugadores.
 
 ---
 
-# ⚙️ Configuración del Proyecto
+## 2.1 Arquitectura General del Sistema
 
-El archivo `settings.py` contiene toda la configuración principal del sistema:
+El proyecto trabaja utilizando el patrón MVT de Django, dividido en tres partes principales:
 
-- configuración de base de datos.
-- aplicaciones instaladas.
-- archivos multimedia.
-- autenticación.
-- archivos estáticos.
-- templates.
-- permisos.
+| Componente | Función |
+|---|---|
+| **Models** | Maneja la base de datos |
+| **Views** | Contiene la lógica del sistema |
+| **Templates** | Muestra la interfaz gráfica |
 
-## Base de Datos
+El funcionamiento general del sistema es el siguiente:
 
-El proyecto utiliza SQLite3:
+'''plaintext
+1. El usuario entra a una URL.
+2. Django revisa el archivo urls.py.
+3. La URL llama una view.
+4. La view obtiene datos desde los models.
+5. Los datos se envían a un template.
+6. El template muestra la información en pantalla.
+'''
 
-```python
+---
+
+## 2.2 Explicación del Archivo settings.py
+
+El archivo `settings.py` es uno de los archivos más importantes del proyecto porque contiene toda la configuración global del sistema. Desde este archivo se controla prácticamente todo el comportamiento interno de Django.
+
+Dentro de `settings.py` se configuran:
+
+- Aplicaciones instaladas
+- Seguridad
+- Conexión a la base de datos
+- Templates
+- Archivos estáticos
+- Archivos multimedia
+- Autenticación
+- Middleware
+- Idioma y zona horaria
+
+### BASE_DIR
+
+'''python
+BASE_DIR = Path(__file__).resolve().parent.parent
+'''
+
+Esta línea define la ruta principal del proyecto. Django utiliza `BASE_DIR` para localizar automáticamente carpetas importantes como templates, imágenes, archivos estáticos y la base de datos principal.
+
+### SECRET_KEY
+
+'''python
+SECRET_KEY = 'django-insecure-tu-llave-secreta-aqui'
+'''
+
+Funciona como una clave privada utilizada internamente por Django para proteger sesiones, formularios, autenticación y cifrado interno.
+
+### DEBUG
+
+'''python
+DEBUG = True
+'''
+
+Cuando `DEBUG` está activado, Django muestra errores detallados y facilita el desarrollo. Sin embargo, al publicar el proyecto en internet debe cambiarse a `False` para proteger información sensible.
+
+### ALLOWED_HOSTS
+
+'''python
+ALLOWED_HOSTS = ['10.20.7.79', 'localhost', '127.0.0.1', '*']
+'''
+
+### INSTALLED_APPS
+
+'''python
+INSTALLED_APPS = [
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    'Estadisticas',
+    'django.contrib.humanize',
+]
+'''
+
+Cada aplicación cumple una función específica:
+
+- **django.contrib.admin:** Activa el panel administrativo de Django.
+- **django.contrib.auth:** Controla usuarios, permisos, autenticación y contraseñas.
+- **django.contrib.messages:** Permite mostrar mensajes automáticos.
+- **django.contrib.staticfiles:** Administra archivos CSS, JavaScript e imágenes estáticas.
+- **django.contrib.humanize:** Convierte números y fechas a formatos legibles para los usuarios.
+- **Estadisticas:** Contiene la lógica desarrollada para el proyecto.
+
+### Configuración de archivos multimedia
+
+'''python
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+'''
+
+### Base de Datos
+
+'''python
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
-```
+'''
 
 ---
 
-# 🔗 Sistema de URLs
+## 2.3 Explicación del Archivo urls.py
 
-El archivo `urls.py` controla la navegación del sistema y conecta las rutas con las views correspondientes.
+El archivo `urls.py` funciona como el sistema principal de navegación del proyecto. Aquí se conectan las rutas del navegador con las views correspondientes.
 
-```python
+'''python
+from django.contrib import admin
+from django.urls import path, include
+from django.conf import settings
+from django.conf.urls.static import static
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('Estadisticas.urls')),
 ]
-```
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+'''
 
 Esto permite acceder a:
 
-- página principal.
-- login.
-- registro.
-- panel de administración.
-- gestión de jugadores y equipos.
+- Página principal
+- Login y registro
+- Panel de administración (`/admin/`)
+- Gestión de jugadores y equipos
 
 ---
 
-# 🧠 Models Principales
+## 2.4 Diseño de la Base de Datos
 
-## 👤 User
+La base de datos fue diseñada cuidadosamente para soportar toda la información deportiva manejada por la plataforma. El sistema utiliza **SQLite3** como motor principal debido a que es ligero, rápido, fácil de configurar y muy útil para proyectos académicos.
 
+Toda la información se almacena dentro del archivo:
 
- Su función es definir la estructura principal de la base de datos utilizando modelos de Django. Aquí se crean los modelos para usuarios, ligas, equipos, jugadores, partidos, estadísticas, trofeos y carrito de compras.
-```
+'''plaintext
+db.sqlite3
+'''
+
+La estructura relacional permite mantener organizada toda la información evitando duplicaciones innecesarias. Por ejemplo, cuando el sistema consulta un jugador, también puede recuperar:
+
+- El equipo al que pertenece
+- La liga donde juega
+- Estadísticas relacionadas
+- Imágenes asociadas
+
+Django utiliza migraciones para crear automáticamente las tablas dentro de SQLite:
+
+'''bash
+python manage.py makemigrations
+python manage.py migrate
+'''
+
+---
+
+## 2.5 Explicación de los Models
+
+Los Models son uno de los componentes más importantes del proyecto porque representan toda la estructura de la base de datos. En Django, cada modelo creado mediante Python se convierte automáticamente en una tabla dentro de SQLite.
+
+Todos los modelos fueron desarrollados dentro del archivo `Estadisticas/models.py`.
+
+Entre los modelos principales se encuentran: **User, Liga, Equipo, Jugador, Partido, Estadistica, Trofeo, Carrito y MercadoDeFichajes.**
+
+'''python
 # coding: utf-8
 import uuid
 from django.db import models
@@ -131,19 +290,16 @@ def limpiar_string_corrupto(valor):
 class User(AbstractUser):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     is_editor = models.BooleanField(default=False)
-
     groups = models.ManyToManyField(
         'auth.Group',
         related_name='estadisticas_user_groups',
         blank=True
     )
-
     user_permissions = models.ManyToManyField(
         'auth.Permission',
         related_name='estadisticas_user_permissions',
         blank=True
     )
-
     def __str__(self):
         return str(self.username)
 
@@ -154,10 +310,8 @@ class Liga(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     nombre = models.CharField(max_length=100, unique=True)
     pais = models.CharField(max_length=100, blank=True)
-
     class Meta:
         verbose_name_plural = "Ligas"
-
     def __str__(self):
         return limpiar_string_corrupto(self.nombre)
 
@@ -170,7 +324,6 @@ class Equipo(models.Model):
     ciudad = models.CharField(max_length=100)
     liga = models.ForeignKey(Liga, on_delete=models.SET_NULL, null=True, related_name='equipos')
     escudo = models.ImageField(upload_to='escudos/', null=True, blank=True)
-
     def __str__(self):
         return limpiar_string_corrupto(self.nombre)
 
@@ -227,178 +380,219 @@ class CartItem(models.Model):
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
     jugador = models.ForeignKey(Jugador, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField(default=1)
-```
-
-Modelo de usuario personalizado con permisos especiales para editores.
-
-Campos principales:
-
-- username
-- password
-- is_editor
+'''
 
 ---
 
-## 🏆 Liga
+## 2.6 Relaciones entre los Models
 
-Representa ligas deportivas registradas en el sistema.
+### Uno a Muchos (ForeignKey)
 
-Campos:
+'''python
+equipo = models.ForeignKey(Equipo, on_delete=models.CASCADE)
+liga = models.ForeignKey(Liga, on_delete=models.CASCADE)
+'''
 
-- nombre
-- pais
+Esto construye una estructura jerárquica organizada: **Liga → Equipo → Jugador → Estadística**.
 
----
+### Muchos a Muchos (ManyToManyField)
 
-## 👑 Equipo
+Utilizada en el Carrito y el Mercado de Fichajes:
 
-Representa equipos deportivos.
+- Un usuario puede agregar muchos jugadores a su carrito.
+- Un mismo jugador puede estar en el carrito de muchos usuarios simultáneamente.
 
-Campos:
+### Identificadores Únicos (UUIDField)
 
-- nombre
-- ciudad
-- liga
-- escudo
+'''python
+id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+'''
 
-Relación:
-
-- Una liga puede tener muchos equipos.
-
----
-
-## 🏃 Jugador
-
-Representa jugadores registrados.
-
-Campos:
-
-- nombre
-- posicion
-- equipo
-- precio
-- foto
-
-Relación:
-
-- Un equipo puede tener muchos jugadores.
+El uso de UUID protege el sistema contra ataques de enumeración y manipulación de URLs.
 
 ---
 
-## ⚽ Partido
+## 2.7 Funcionamiento del Django Admin
 
-Representa encuentros deportivos entre equipos.
+El panel administrativo de Django permite administrar toda la información deportiva desde una interfaz gráfica, realizando operaciones CRUD:
 
-Campos:
-
-- equipo_local
-- equipo_visitante
-- goles
-- fecha
-- torneo
-
----
-
-## 📊 EstadisticaPartido
-
-Guarda estadísticas individuales de jugadores por partido.
-
-Campos:
-
-- goles
-- asistencias
-- tarjetas amarillas
-- tarjetas rojas
+| Operación | Descripción |
+|---|---|
+| **Create** | Crear nuevos registros |
+| **Read** | Visualizar información |
+| **Update** | Modificar datos existentes |
+| **Delete** | Eliminar elementos |
 
 ---
 
-## 🛒 Cart y CartItem
+## 2.8 Entrada, Actualización y Eliminación de Datos
 
-Implementan el sistema de carrito de fichajes deportivos.
+**Entrada de datos (Create):** Al añadir un jugador, Django detecta la ForeignKey hacia Equipo y genera automáticamente un menú de selección. Al guardar ejecuta internamente:
+
+'''sql
+INSERT INTO Estadisticas_jugador (...)
+'''
+
+**Actualización de datos (Update):** Al modificar un registro, Django lo busca mediante su UUID y ejecuta:
+
+'''sql
+UPDATE Estadisticas_jugador SET precio = X WHERE id = UUID
+'''
+
+**Eliminación de datos (Delete):** Django analiza las relaciones existentes antes de eliminar. Gracias a `CASCADE`, si un equipo es eliminado, también se eliminan automáticamente sus jugadores relacionados:
+
+'''python
+on_delete=models.CASCADE
+'''
 
 ---
 
-# 🔄 Funcionamiento de las Views
+## 2.9 Explicación de las Views
 
-Las views contienen toda la lógica funcional del sistema.
+Las views son el intermediario entre URLs, Models y Templates. Cuando un usuario entra a una página:
 
-Las views:
+'''plaintext
+1. Django detecta la URL.
+2. La URL ejecuta una view.
+3. La view procesa la solicitud.
+4. La view consulta modelos.
+5. Los datos son enviados al template.
+6. El template genera HTML dinámico.
+'''
 
-- reciben solicitudes desde las URLs.
-- consultan datos desde los models.
-- procesan información.
-- envían datos a los templates.
+Ejemplo de la vista principal:
 
-Ejemplo:
+'''python
+@login_required
+def rendimiento_carga_masiva(request):
+    if not request.user.is_editor:
+        return HttpResponseForbidden("Acceso denegado.")
 
-```python
-def home(request):
-    jugadores_list = Jugador.objects.all()
+    form_rendimiento = ImportarRendimientoForm(request.POST or None)
+    mensaje_error = None
 
-    return render(request, 'Estadisticas/home.html', {
-        'page_obj': jugadores_list
+    if request.method == 'POST' and form_rendimiento.is_valid():
+        partido_sel = form_rendimiento.cleaned_data['partido']
+        lineas = form_rendimiento.cleaned_data['rendimiento_pegado'].strip().split('\n')
+
+        for num_linea, linea in enumerate(lineas, 1):
+            partes = linea.strip().split(',')
+            if len(partes) >= 5:
+                jugador_obj = Jugador.objects.filter(nombre__iexact=partes[0]).first()
+                if jugador_obj:
+                    EstadisticaPartido.objects.update_or_create(
+                        partido=partido_sel,
+                        jugador=jugador_obj,
+                        defaults={
+                            'goles': int(partes[1]),
+                            'asistencias': int(partes[2]),
+                            'amarillas': int(partes[3]),
+                            'rojas': int(partes[4])
+                        }
+                    )
+
+    return render(request, 'Estadisticas/rendimiento_masivo_form.html', {
+        'form_rendimiento': form_rendimiento,
+        'mensaje_error': mensaje_error,
+        'titulo': 'Carga Masiva de Estadísticas'
     })
-```
+'''
+
+El sistema también implementa búsquedas dinámicas:
+
+'''python
+Jugador.objects.select_related('equipo__liga').all()
+Q(nombre__icontains=query)
+'''
 
 ---
 
-# 🌐 Interacción entre URLs, Views y Templates
+## 2.10 Interacción entre URLs, Views y Templates
 
-El sistema trabaja siguiendo el patrón MVT de Django:
+El correcto funcionamiento del sistema depende de la interacción entre sus tres componentes principales:
 
-```plaintext
-     Usuario
+'''plaintext
+Usuario entra al navegador
         ↓
-       URL
+Django recibe solicitud HTTP
         ↓
-       View
+urls.py identifica la ruta
         ↓
-      Model
+Se ejecuta una view
         ↓
-   Base de Datos
+La view procesa la lógica
         ↓
-     Template
+La view consulta models
         ↓
-    Interfaz Web
-```
+SQLite devuelve información
+        ↓
+La view envía datos al template
+        ↓
+El template genera HTML dinámico
+        ↓
+El navegador muestra resultados
+'''
 
-Las URLs llaman las views, las views consultan los models y los templates muestran la información visualmente.
+Ejemplo del sistema de URLs:
+
+'''python
+urlpatterns = [
+    path('', views.home, name='home'),
+    path('equipo/<uuid:equipo_id>/', views.detalle_equipo, name='detalle_equipo'),
+    path('agregar-ideal/<uuid:jugador_id>/', views.agregar_al_equipo_ideal, name='agregar_ideal'),
+    path('eliminar-ideal/<uuid:jugador_id>/', views.eliminar_del_equipo_ideal, name='eliminar_ideal'),
+    path('panel/rendimiento-masivo/', views.rendimiento_carga_masiva, name='rendimiento_carga_masiva'),
+]
+'''
 
 ---
 
-# 🛡️ Panel Administrativo
+## 2.11 Templates e Interfaz de Usuario
 
-Django incluye un panel administrativo para gestionar toda la base de datos.
+Los templates utilizan HTML junto con Django Template Language para generar interfaces visuales dinámicas:
 
-Ruta:
+'''html
+<h1>{{ jugador.nombre }}</h1>
+<img src="{{ jugador.foto.url }}">
+'''
 
-```plaintext
-/admin/
-```
+Ejemplo de template personalizado para el admin:
 
-Desde el admin se pueden:
-
-- crear jugadores.
-- editar equipos.
-- eliminar registros.
-- administrar usuarios.
-- modificar estadísticas.
+'''html
+{% extends "admin/change_list.html" %}
+{% load i18n %}
+{% block object-tools-items %}
+  <li>
+    <a href="add/" style="background-color: #e67e22 !important; color: white !important;
+    font-weight: bold; border-radius: 4px; padding: 10px 15px; display: inline-block;">
+      🚀 Ir a Carga Masiva (Por Comas)
+    </a>
+  </li>
+  {{ block.super }}
+{% endblock %}
+'''
 
 ---
 
-# 📸 Archivos Multimedia
+# 📂 Estructura General del Proyecto
 
-El sistema permite subir:
-
-- fotos de jugadores.
-- escudos de equipos.
-
-Configuración:
-
-```python
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-```
+'''plaintext
+Sport_Stats_Project/
+│
+├── Estadisticas/
+│   ├── models.py
+│   ├── views.py
+│   ├── urls.py
+│   ├── forms.py
+│   ├── templates/
+│   └── static/
+│
+├── media/
+├── static/
+├── db.sqlite3
+├── manage.py
+└── README.md
+'''
 
 ---
 
@@ -406,66 +600,58 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 ## 1. Clonar repositorio
 
-```bash
+'''bash
 git clone <url-del-repositorio>
-```
-
----
+'''
 
 ## 2. Crear entorno virtual
 
-```bash
+'''bash
 python -m venv venv
-```
-
----
+'''
 
 ## 3. Activar entorno virtual
 
 ### Windows
 
-```bash
+'''bash
 venv\Scripts\activate
-```
+'''
 
 ### Linux/Mac
 
-```bash
+'''bash
 source venv/bin/activate
-```
-
----
+'''
 
 ## 4. Instalar librerias
 
-```bash
+'''bash
 pip install pillow
-
 pip install django==5.2
-```
-
----
+'''
 
 ## 5. Ejecutar migraciones
 
-```bash
+'''bash
 python manage.py makemigrations
-
 python manage.py migrate
-```
+'''
 
----
+## 6. Crear superusuario
 
-## 6. Crear usuario
-```bash
+'''bash
 python manage.py createsuperuser
-```
+'''
 
 ## 7. Ejecutar servidor
 
-```bash
+'''bash
 python manage.py runserver
-```
+'''
+
+Accede al sistema en: `http://127.0.0.1:8000/`
+Panel administrativo en: `http://127.0.0.1:8000/admin/`
 
 ---
 
@@ -484,8 +670,16 @@ python manage.py runserver
 
 ---
 
-# 📖 Conclusión
+# 📖 Conclusión Final
 
-Sport Stats Project es una aplicación web desarrollada en Django que permite administrar información deportiva de manera organizada, dinámica y segura. El sistema integra autenticación, administración de estadísticas, relaciones entre modelos, carga de imágenes y gestión de fichajes mediante una arquitectura basada en el patrón MVT.
+El desarrollo del proyecto Sport Stats Project permitió comprender de manera práctica el funcionamiento del framework Django y la forma en que interactúan sus principales componentes dentro de una aplicación web dinámica. A lo largo del proyecto fue posible implementar correctamente el patrón de arquitectura MVT (Model - View - Template), logrando separar la lógica del sistema, la base de datos y la interfaz gráfica de usuario para mantener una estructura organizada y funcional.
 
+Mediante el uso de models se diseñó una base de datos capaz de administrar información relacionada con jugadores, equipos, ligas, partidos, estadísticas y usuarios. Las views permitieron controlar toda la lógica del proyecto, procesando solicitudes de los usuarios, realizando consultas a la base de datos y enviando información hacia los templates.
 
+El panel administrativo de Django facilitó enormemente la gestión de información mediante operaciones CRUD, permitiendo crear, modificar y eliminar registros de manera rápida y segura sin necesidad de trabajar directamente sobre la base de datos.
+
+Finalmente, este proyecto ayudó a fortalecer conocimientos sobre desarrollo web, bases de datos, organización de proyectos en Django y funcionamiento interno de aplicaciones dinámicas, demostrando cómo un framework puede facilitar la creación de sistemas modernos, seguros y escalables.
+
+---
+
+**CBTIS 116 — Tijuana, B.C. — 2026**
