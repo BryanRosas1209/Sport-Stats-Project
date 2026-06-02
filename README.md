@@ -268,7 +268,7 @@ Todos los modelos fueron desarrollados dentro del archivo `Estadisticas/models.p
 
 Entre los modelos principales se encuentran: **User, Liga, Equipo, Jugador, Partido, Estadistica, Trofeo, Carrito y MercadoDeFichajes.**
 
-'''python
+'''
 # coding: utf-8
 import uuid
 from django.db import models
