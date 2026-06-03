@@ -105,7 +105,7 @@ El proyecto trabaja utilizando el patrón MVT de Django, dividido en tres partes
 
 El funcionamiento general del sistema es el siguiente:
 
-'''plaintext
+'''
 1. El usuario entra a una URL.
 2. Django revisa el archivo urls.py.
 3. La URL llama una view.
@@ -240,7 +240,7 @@ La base de datos fue diseñada cuidadosamente para soportar toda la información
 
 Toda la información se almacena dentro del archivo:
 
-'''plaintext
+'''
 db.sqlite3
 '''
 
@@ -551,14 +551,14 @@ urlpatterns = [
 
 Los templates utilizan HTML junto con Django Template Language para generar interfaces visuales dinámicas:
 
-'''html
+'''
 <h1>{{ jugador.nombre }}</h1>
 <img src="{{ jugador.foto.url }}">
 '''
 
 Ejemplo de template personalizado para el admin:
 
-'''html
+'''
 {% extends "admin/change_list.html" %}
 {% load i18n %}
 {% block object-tools-items %}
