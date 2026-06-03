@@ -105,14 +105,14 @@ El proyecto trabaja utilizando el patrón MVT de Django, dividido en tres partes
 
 El funcionamiento general del sistema es el siguiente:
 
-'''
+```plaintext
 1. El usuario entra a una URL.
 2. Django revisa el archivo urls.py.
 3. La URL llama una view.
 4. La view obtiene datos desde los models.
 5. Los datos se envían a un template.
 6. El template muestra la información en pantalla.
-'''
+```
 
 ---
 
@@ -134,37 +134,37 @@ Dentro de `settings.py` se configuran:
 
 ### BASE_DIR
 
-'''python
+```python
 BASE_DIR = Path(__file__).resolve().parent.parent
-'''
+```
 
 Esta línea define la ruta principal del proyecto. Django utiliza `BASE_DIR` para localizar automáticamente carpetas importantes como templates, imágenes, archivos estáticos y la base de datos principal.
 
 ### SECRET_KEY
 
-'''python
+```python
 SECRET_KEY = 'django-insecure-tu-llave-secreta-aqui'
-'''
+```
 
 Funciona como una clave privada utilizada internamente por Django para proteger sesiones, formularios, autenticación y cifrado interno.
 
 ### DEBUG
 
-'''python
+```python
 DEBUG = True
-'''
+```
 
 Cuando `DEBUG` está activado, Django muestra errores detallados y facilita el desarrollo. Sin embargo, al publicar el proyecto en internet debe cambiarse a `False` para proteger información sensible.
 
 ### ALLOWED_HOSTS
 
-'''python
+```python
 ALLOWED_HOSTS = ['10.20.7.79', 'localhost', '127.0.0.1', '*']
-'''
+```
 
 ### INSTALLED_APPS
 
-'''python
+```python
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -175,7 +175,7 @@ INSTALLED_APPS = [
     'Estadisticas',
     'django.contrib.humanize',
 ]
-'''
+```
 
 Cada aplicación cumple una función específica:
 
@@ -188,21 +188,21 @@ Cada aplicación cumple una función específica:
 
 ### Configuración de archivos multimedia
 
-'''python
+```python
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
-'''
+```
 
 ### Base de Datos
 
-'''python
+```python
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
-'''
+```
 
 ---
 
@@ -210,7 +210,7 @@ DATABASES = {
 
 El archivo `urls.py` funciona como el sistema principal de navegación del proyecto. Aquí se conectan las rutas del navegador con las views correspondientes.
 
-'''python
+```python
 from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
@@ -223,7 +223,7 @@ urlpatterns = [
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-'''
+```
 
 Esto permite acceder a:
 
@@ -240,9 +240,9 @@ La base de datos fue diseñada cuidadosamente para soportar toda la información
 
 Toda la información se almacena dentro del archivo:
 
-'''
+```plaintext
 db.sqlite3
-'''
+```
 
 La estructura relacional permite mantener organizada toda la información evitando duplicaciones innecesarias. Por ejemplo, cuando el sistema consulta un jugador, también puede recuperar:
 
@@ -253,10 +253,10 @@ La estructura relacional permite mantener organizada toda la información evitan
 
 Django utiliza migraciones para crear automáticamente las tablas dentro de SQLite:
 
-'''bash
+```bash
 python manage.py makemigrations
 python manage.py migrate
-'''
+```
 
 ---
 
@@ -268,7 +268,7 @@ Todos los modelos fueron desarrollados dentro del archivo `Estadisticas/models.p
 
 Entre los modelos principales se encuentran: **User, Liga, Equipo, Jugador, Partido, Estadistica, Trofeo, Carrito y MercadoDeFichajes.**
 
-'''
+```python
 # coding: utf-8
 import uuid
 from django.db import models
@@ -380,7 +380,7 @@ class CartItem(models.Model):
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
     jugador = models.ForeignKey(Jugador, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField(default=1)
-'''
+```
 
 ---
 
@@ -388,10 +388,10 @@ class CartItem(models.Model):
 
 ### Uno a Muchos (ForeignKey)
 
-'''python
+```python
 equipo = models.ForeignKey(Equipo, on_delete=models.CASCADE)
 liga = models.ForeignKey(Liga, on_delete=models.CASCADE)
-'''
+```
 
 Esto construye una estructura jerárquica organizada: **Liga → Equipo → Jugador → Estadística**.
 
@@ -404,9 +404,9 @@ Utilizada en el Carrito y el Mercado de Fichajes:
 
 ### Identificadores Únicos (UUIDField)
 
-'''python
+```python
 id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-'''
+```
 
 El uso de UUID protege el sistema contra ataques de enumeración y manipulación de URLs.
 
@@ -429,21 +429,21 @@ El panel administrativo de Django permite administrar toda la información depor
 
 **Entrada de datos (Create):** Al añadir un jugador, Django detecta la ForeignKey hacia Equipo y genera automáticamente un menú de selección. Al guardar ejecuta internamente:
 
-'''sql
+```sql
 INSERT INTO Estadisticas_jugador (...)
-'''
+```
 
 **Actualización de datos (Update):** Al modificar un registro, Django lo busca mediante su UUID y ejecuta:
 
-'''sql
+```sql
 UPDATE Estadisticas_jugador SET precio = X WHERE id = UUID
-'''
+```
 
 **Eliminación de datos (Delete):** Django analiza las relaciones existentes antes de eliminar. Gracias a `CASCADE`, si un equipo es eliminado, también se eliminan automáticamente sus jugadores relacionados:
 
-'''python
+```python
 on_delete=models.CASCADE
-'''
+```
 
 ---
 
@@ -451,18 +451,18 @@ on_delete=models.CASCADE
 
 Las views son el intermediario entre URLs, Models y Templates. Cuando un usuario entra a una página:
 
-'''plaintext
+```plaintext
 1. Django detecta la URL.
 2. La URL ejecuta una view.
 3. La view procesa la solicitud.
 4. La view consulta modelos.
 5. Los datos son enviados al template.
 6. El template genera HTML dinámico.
-'''
+```
 
-Ejemplo de la vista principal:
+Ejemplo de vista con carga masiva de estadísticas:
 
-'''python
+```python
 @login_required
 def rendimiento_carga_masiva(request):
     if not request.user.is_editor:
@@ -496,14 +496,14 @@ def rendimiento_carga_masiva(request):
         'mensaje_error': mensaje_error,
         'titulo': 'Carga Masiva de Estadísticas'
     })
-'''
+```
 
 El sistema también implementa búsquedas dinámicas:
 
-'''python
+```python
 Jugador.objects.select_related('equipo__liga').all()
 Q(nombre__icontains=query)
-'''
+```
 
 ---
 
@@ -511,7 +511,7 @@ Q(nombre__icontains=query)
 
 El correcto funcionamiento del sistema depende de la interacción entre sus tres componentes principales:
 
-'''plaintext
+```plaintext
 Usuario entra al navegador
         ↓
 Django recibe solicitud HTTP
@@ -531,11 +531,11 @@ La view envía datos al template
 El template genera HTML dinámico
         ↓
 El navegador muestra resultados
-'''
+```
 
 Ejemplo del sistema de URLs:
 
-'''python
+```python
 urlpatterns = [
     path('', views.home, name='home'),
     path('equipo/<uuid:equipo_id>/', views.detalle_equipo, name='detalle_equipo'),
@@ -543,7 +543,7 @@ urlpatterns = [
     path('eliminar-ideal/<uuid:jugador_id>/', views.eliminar_del_equipo_ideal, name='eliminar_ideal'),
     path('panel/rendimiento-masivo/', views.rendimiento_carga_masiva, name='rendimiento_carga_masiva'),
 ]
-'''
+```
 
 ---
 
@@ -551,14 +551,14 @@ urlpatterns = [
 
 Los templates utilizan HTML junto con Django Template Language para generar interfaces visuales dinámicas:
 
-'''
+```html
 <h1>{{ jugador.nombre }}</h1>
 <img src="{{ jugador.foto.url }}">
-'''
+```
 
 Ejemplo de template personalizado para el admin:
 
-'''
+```html
 {% extends "admin/change_list.html" %}
 {% load i18n %}
 {% block object-tools-items %}
@@ -570,13 +570,13 @@ Ejemplo de template personalizado para el admin:
   </li>
   {{ block.super }}
 {% endblock %}
-'''
+```
 
 ---
 
 # 📂 Estructura General del Proyecto
 
-'''plaintext
+```plaintext
 Sport_Stats_Project/
 │
 ├── Estadisticas/
@@ -592,7 +592,7 @@ Sport_Stats_Project/
 ├── db.sqlite3
 ├── manage.py
 └── README.md
-'''
+```
 
 ---
 
@@ -600,57 +600,57 @@ Sport_Stats_Project/
 
 ## 1. Clonar repositorio
 
-'''bash
+```bash
 git clone <url-del-repositorio>
-'''
+```
 
 ## 2. Crear entorno virtual
 
-'''bash
+```bash
 python -m venv venv
-'''
+```
 
 ## 3. Activar entorno virtual
 
 ### Windows
 
-'''bash
+```bash
 venv\Scripts\activate
-'''
+```
 
 ### Linux/Mac
 
-'''bash
+```bash
 source venv/bin/activate
-'''
+```
 
 ## 4. Instalar librerias
 
-'''bash
+```bash
 pip install pillow
 pip install django==5.2
-'''
+```
 
 ## 5. Ejecutar migraciones
 
-'''bash
+```bash
 python manage.py makemigrations
 python manage.py migrate
-'''
+```
 
 ## 6. Crear superusuario
 
-'''bash
+```bash
 python manage.py createsuperuser
-'''
+```
 
 ## 7. Ejecutar servidor
 
-'''bash
+```bash
 python manage.py runserver
-'''
+```
 
-Accede al sistema en: `http://127.0.0.1:8000/`
+Accede al sistema en: `http://127.0.0.1:8000/`  
 Panel administrativo en: `http://127.0.0.1:8000/admin/`
 
 ---
